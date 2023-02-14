@@ -57,7 +57,7 @@ public:
   };
 
   // The robot's commands are defined here...
-  DriveRunner driveRunner {&m_drive, &m_driverController};
+  DriveRunner m_driveRunner {&m_drive, &m_driverController};
 
   void ConfigureBindings();
 };

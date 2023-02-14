@@ -51,16 +51,14 @@ void Robot::TeleopInit() {
   if (m_autonomousCommand) {
     m_autonomousCommand->Cancel();
   }
-}
 
-#include <iostream>
+  frc2::CommandScheduler::GetInstance().Schedule(&m_container.m_driveRunner);
+}
 
 /**
  * This function is called periodically during operator control.
  */
-void Robot::TeleopPeriodic() {
-  m_container.driveRunner.Execute();
-}
+void Robot::TeleopPeriodic() {}
 
 /**
  * This function is called periodically during test mode.

@@ -27,7 +27,9 @@ class DriveRunner : public frc2::CommandHelper<frc2::CommandBase, DriveRunner> {
    */
   explicit DriveRunner(Drive *drive, frc2::CommandXboxController *driverController);
 
-  void Execute();
+  void Execute() override;
+  bool IsFinished() override;
+  void End(bool interrupted) override;
 
  private:
   Drive *m_drive;
