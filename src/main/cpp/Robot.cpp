@@ -59,10 +59,7 @@ void Robot::TeleopInit() {
  * This function is called periodically during operator control.
  */
 void Robot::TeleopPeriodic() {
-  const auto x = m_container.m_driverController.GetLeftY();
-  const auto r = m_container.m_driverController.GetRightX();
-
-  m_container.m_drive.SetPower(-x, r, 0.25);
+  m_container.driveRunner.Execute();
 }
 
 /**

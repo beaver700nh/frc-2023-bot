@@ -28,7 +28,7 @@ public:
   /**
    * Example command factory method.
    */
-  void SetPower(double x, double r, double k);
+  void SetPower(double x, double r, double k = 1);
 
 private:
   // Components (e.g. motor controllers and sensors) should generally be

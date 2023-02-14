@@ -20,6 +20,7 @@
 #include "subsystems/ExampleSubsystem.h"
 
 #include "commands/Autos.h"
+#include "commands/DriveRunner.h"
 #include "commands/ExampleCommand.h"
 
 using Driver = ctre::phoenix::motorcontrol::can::WPI_TalonFX;
@@ -54,6 +55,9 @@ public:
       0.04, 0.04
     }
   };
+
+  // The robot's commands are defined here...
+  DriveRunner driveRunner {&m_drive, &m_driverController};
 
   void ConfigureBindings();
 };
