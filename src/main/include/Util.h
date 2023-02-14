@@ -20,4 +20,24 @@ namespace Util {
 
     return 0;
   }
+
+  auto constrained(auto var, auto min, auto max) {
+    if (var < min) {
+      return min;
+    }
+
+    if (var > max) {
+      return max;
+    }
+
+    return var;
+  }
+
+  auto thresholded(auto var, auto min, auto max) {
+    if (min < var && var < max) {
+      return (decltype(var)) 0;
+    }
+
+    return var;
+  }
 };

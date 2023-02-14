@@ -6,6 +6,7 @@
 
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
+#include <frc2/command/button/CommandXboxController.h>
 
 #include <frc/motorcontrol/MotorController.h>
 
@@ -25,16 +26,17 @@ class Drive : public frc2::SubsystemBase {
 public:
   Drive(DriveConfig config);
 
-  /**
-   * Example command factory method.
-   */
+  void AttachController(frc2::CommandXboxController *driverController);
+
   void SetPower(double x, double r, double k = 1);
+
+  void Periodic();
 
 private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
+  frc2::CommandXboxController *m_driverController;
 
   DriveConfig config;
-
   double curX = 0, curR = 0;
 };

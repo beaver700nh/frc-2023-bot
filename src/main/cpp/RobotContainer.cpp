@@ -11,6 +11,7 @@
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
+  m_drive.AttachController(&m_driverController);
 
   // Configure the button bindings
   ConfigureBindings();

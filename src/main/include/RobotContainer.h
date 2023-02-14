@@ -8,7 +8,6 @@
 #include <vector>
 
 #include <frc2/command/CommandPtr.h>
-#include <frc2/command/button/CommandXboxController.h>
 
 #include <frc/motorcontrol/MotorControllerGroup.h>
 
@@ -20,7 +19,6 @@
 #include "subsystems/ExampleSubsystem.h"
 
 #include "commands/Autos.h"
-#include "commands/DriveRunner.h"
 #include "commands/ExampleCommand.h"
 
 using Driver = ctre::phoenix::motorcontrol::can::WPI_TalonFX;
@@ -55,9 +53,6 @@ public:
       0.04, 0.04
     }
   };
-
-  // The robot's commands are defined here...
-  DriveRunner m_driveRunner {&m_drive, &m_driverController};
 
   void ConfigureBindings();
 };
