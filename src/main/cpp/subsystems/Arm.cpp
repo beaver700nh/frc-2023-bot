@@ -29,7 +29,7 @@ void Arm::AttachPneumatics(Pneumatics *pneumatics) {
 
 void Arm::SetTilt(double x, double k) {
   if (!m_pneumatics) {
-    std::cerr << "ERROR in Arm: pneu is null." << std::endl;
+    std::cerr << "ERROR in Arm: pneumatics is null." << std::endl;
     return;
   }
 
@@ -41,7 +41,13 @@ void Arm::SetTilt(double x, double k) {
   }
 
   Util::ramp(&m_curTilt, x * k, m_rampTilt);
-  m_motorTilt.Set(m_curTilt);
+
+  if (!m_lmswTilt.Get() && x > 0) {
+    m_motorTilt.Set(0);
+  }
+  else {
+    m_motorTilt.Set(m_curTilt);
+  }
 }
 
 void Arm::SetRotate(double x, double k) {
@@ -51,7 +57,13 @@ void Arm::SetRotate(double x, double k) {
 
 void Arm::SetExtend(double x, double k) {
   Util::ramp(&m_curExtend, x * k, m_rampExtend);
-  m_motorExtend.Set(m_curExtend);
+
+  if (!m_lmswExtend.Get() && x < 0) {
+    m_motorExtend.Set(0);
+  }
+  else {
+    m_motorExtend.Set(m_curExtend);
+  }
 }
 
 void Arm::Periodic() {
