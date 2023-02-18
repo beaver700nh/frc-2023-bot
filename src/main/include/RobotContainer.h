@@ -40,6 +40,9 @@ public:
     OperatorConstants::kArmInvertTilt,
     OperatorConstants::kArmInvertRotate,
     OperatorConstants::kArmInvertExtend,
+    OperatorConstants::kArmRampTilt,
+    OperatorConstants::kArmRampRotate,
+    OperatorConstants::kArmRampExtend,
   };
 
   Drive m_drive {

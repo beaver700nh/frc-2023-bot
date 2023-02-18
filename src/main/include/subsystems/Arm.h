@@ -16,7 +16,10 @@ using MotorArmType = rev::CANSparkMaxLowLevel::MotorType;
 
 class Arm : public frc2::SubsystemBase {
 public:
-  Arm(bool invertTilt, bool invertRotate, bool invertExtend);
+  Arm(
+    bool invertTilt, bool invertRotate, bool invertExtend,
+    double rampTilt, double rampRotate, double rampExtend
+  );
 
   void AttachController(frc2::CommandXboxController *driverController);
 
@@ -24,7 +27,7 @@ public:
   void SetRotate(double x, double k = 1.0);
   void SetExtend(double x, double k = 1.0);
 
-  void Periodic();
+  void Periodic() override;
 
 private:
   // Components (e.g. motor controllers and sensors) should generally be
@@ -35,7 +38,11 @@ private:
   MotorArm m_motorRotate {CanIds::kArmRotate, MotorArmType::kBrushless};
   MotorArm m_motorExtend {CanIds::kArmExtend, MotorArmType::kBrushless};
 
-  static constexpr double kTiltPower   = 1.0;
-  static constexpr double kRotatePower = 1.0;
-  static constexpr double kExtendPower = 1.0;
+  const double m_rampTilt, m_rampRotate, m_rampExtend;
+
+  double m_curTilt = 0.0, m_curRotate = 0.0, m_curExtend = 0.0;
+
+  static constexpr double kCoeffTilt   = 1.0;
+  static constexpr double kCoeffRotate = 1.0;
+  static constexpr double kCoeffExtend = 1.0;
 };

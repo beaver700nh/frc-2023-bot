@@ -29,7 +29,7 @@ public:
 
   void SetPower(double x, double r, double k = 1.0);
 
-  void Periodic();
+  void Periodic() override;
 
 private:
   // Components (e.g. motor controllers and sensors) should generally be
@@ -53,5 +53,7 @@ private:
 
   const double m_rampX, m_rampR;
 
-  double m_curX = 0, m_curR = 0;
+  double m_curX = 0.0, m_curR = 0.0;
+
+  static constexpr double kCoeffDriveTrain = 0.25;
 };
