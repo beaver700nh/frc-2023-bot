@@ -17,11 +17,11 @@ void Drive::AttachController(frc2::CommandXboxController *driverController) {
 }
 
 void Drive::SetPower(double x, double r, double k) {
-  Util::ramp(&curX, x * k, rampX);
-  Util::ramp(&curR, r * k, rampR);
+  Util::ramp(&m_curX, x * k, m_rampX);
+  Util::ramp(&m_curR, r * k, m_rampR);
 
-  m_ctrlL.Set(curX - curR);
-  m_ctrlR.Set(curX + curR);
+  m_ctrlL.Set(m_curX - m_curR);
+  m_ctrlR.Set(m_curX + m_curR);
 }
 
 void Drive::Periodic() {

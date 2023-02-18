@@ -51,7 +51,7 @@ private:
   frc::MotorControllerGroup m_ctrlL {std::move(m_motorsL)};
   frc::MotorControllerGroup m_ctrlR {std::move(m_motorsR)};
 
-  const double rampX, rampR;
+  const double m_rampX, m_rampR;
 
-  double curX = 0, curR = 0;
+  double m_curX = 0, m_curR = 0;
 };
