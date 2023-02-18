@@ -9,6 +9,8 @@
 
 #include <rev/CANSparkMax.h>
 
+#include "subsystems/Pneumatics.h"
+
 #include "Constants.h"
 
 using MotorArm = rev::CANSparkMax;
@@ -22,6 +24,7 @@ public:
   );
 
   void AttachController(frc2::CommandXboxController *driverController);
+  void AttachPneumatics(Pneumatics *pneumatics);
 
   void SetTilt  (double x, double k = 1.0);
   void SetRotate(double x, double k = 1.0);
@@ -32,7 +35,9 @@ public:
 private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
-  frc2::CommandXboxController *m_driverController;
+  frc2::CommandXboxController *m_driverController = nullptr;
+
+  Pneumatics *m_pneumatics = nullptr;
 
   MotorArm m_motorTilt   {CanIds::kArmTilt,   MotorArmType::kBrushless};
   MotorArm m_motorRotate {CanIds::kArmRotate, MotorArmType::kBrushless};

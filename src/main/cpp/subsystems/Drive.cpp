@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <iostream>
+
 #include "subsystems/Drive.h"
 
 #include "Util.h"
@@ -25,6 +27,11 @@ void Drive::SetPower(double x, double r, double k) {
 }
 
 void Drive::Periodic() {
+  if (!m_driverController) {
+    std::cerr << "ERROR in Drive: driverController is null." << std::endl;
+    return;
+  }
+
   const auto x = Util::thresholded(m_driverController->GetLeftY(), 0.1, -0.1);
   const auto r = Util::thresholded(m_driverController->GetLeftX(), 0.1, -0.1);
 

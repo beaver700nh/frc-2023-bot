@@ -34,7 +34,7 @@ public:
 private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
-  frc2::CommandXboxController *m_driverController;
+  frc2::CommandXboxController *m_driverController = nullptr;
 
   MotorDriver m_motors[4] {
     {CanIds::kDriveL1},

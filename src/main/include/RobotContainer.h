@@ -10,6 +10,7 @@
 
 #include "subsystems/Arm.h"
 #include "subsystems/Drive.h"
+#include "subsystems/Pneumatics.h"
 #include "subsystems/ExampleSubsystem.h"
 
 #include "commands/Autos.h"
@@ -51,6 +52,8 @@ public:
     OperatorConstants::kDriveRampX,
     OperatorConstants::kDriveRampR,
   };
+
+  Pneumatics m_pneu {};
 
   void ConfigureBindings();
 };

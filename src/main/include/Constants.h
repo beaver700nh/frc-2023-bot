@@ -18,7 +18,7 @@ namespace OperatorConstants {
   constexpr int kDriverControllerPort = 0;
 
   constexpr bool kArmInvertTilt   = false;
-  constexpr bool kArmInvertRotate = false;
+  constexpr bool kArmInvertRotate = true;
   constexpr bool kArmInvertExtend = false;
   constexpr double kArmRampTilt   = 0.04;
   constexpr double kArmRampRotate = 0.04;
@@ -39,4 +39,6 @@ namespace CanIds {
   constexpr int kArmTilt   = 6;
   constexpr int kArmRotate = 7;
   constexpr int kArmExtend = 8;
+
+  constexpr int kPneuCtrlHub = 11;
 }
