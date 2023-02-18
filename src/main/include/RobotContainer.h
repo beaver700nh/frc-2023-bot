@@ -6,8 +6,6 @@
 
 #include <frc2/command/CommandPtr.h>
 
-#include <frc/Solenoid.h>
-
 #include "Constants.h"
 
 #include "subsystems/Arm.h"
