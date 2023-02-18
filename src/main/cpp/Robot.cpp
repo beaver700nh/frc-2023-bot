@@ -6,6 +6,8 @@
 
 #include <frc2/command/CommandScheduler.h>
 
+#include <iostream>
+
 void Robot::RobotInit() {}
 
 /**
