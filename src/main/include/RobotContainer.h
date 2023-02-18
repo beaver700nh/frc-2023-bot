@@ -4,26 +4,18 @@
 
 #pragma once
 
-#include <functional>
-#include <vector>
-
 #include <frc2/command/CommandPtr.h>
 
 #include <frc/Solenoid.h>
-#include <frc/motorcontrol/MotorControllerGroup.h>
-
-#include <ctre/phoenix/motorcontrol/can/WPI_TalonFX.h>
 
 #include "Constants.h"
 
+#include "subsystems/Arm.h"
 #include "subsystems/Drive.h"
 #include "subsystems/ExampleSubsystem.h"
 
 #include "commands/Autos.h"
 #include "commands/ExampleCommand.h"
-
-using MotorDriver = ctre::phoenix::motorcontrol::can::WPI_TalonFX;
-using MotorCollection = std::vector<std::reference_wrapper<frc::MotorController>>;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -39,24 +31,24 @@ public:
   frc2::CommandPtr GetAutonomousCommand();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  frc2::CommandXboxController m_driverController {OperatorConstants::kDriverControllerPort};
+  frc2::CommandXboxController m_driverController {
+    OperatorConstants::kDriverControllerPort,
+  };
 
   // The robot's subsystems are defined here...
   ExampleSubsystem m_subsystem;
 
-  MotorDriver m_motors[4] {{0}, {1}, {2}, {3}};
-
-#define MOTOR(n) (*(frc::MotorController *) (m_motors + (n)))
-  MotorCollection m_motors_l {MOTOR(0), MOTOR(1)};
-  MotorCollection m_motors_r {MOTOR(2), MOTOR(3)};
-#undef MOTOR
+  Arm m_arm {
+    OperatorConstants::kArmInvertTilt,
+    OperatorConstants::kArmInvertRotate,
+    OperatorConstants::kArmInvertExtend,
+  };
 
   Drive m_drive {
-    DriveConfig {
-      Motor {new frc::MotorControllerGroup(std::move(m_motors_l)), false},
-      Motor {new frc::MotorControllerGroup(std::move(m_motors_r)), true},
-      0.04, 0.04
-    }
+    OperatorConstants::kDriveInvertL,
+    OperatorConstants::kDriveInvertR,
+    OperatorConstants::kDriveRampX,
+    OperatorConstants::kDriveRampR,
   };
 
   void ConfigureBindings();

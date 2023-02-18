@@ -6,9 +6,10 @@
 
 #include "Util.h"
 
-Drive::Drive(DriveConfig config)
-  : config(config) {
-  // Implementation of subsystem constructor goes here.
+Drive::Drive(bool invertL, bool invertR, double rampX, double rampR)
+  : m_rampX(rampX), m_rampR(rampR) {
+  m_ctrlL.SetInverted(invertL);
+  m_ctrlR.SetInverted(invertR);
 }
 
 void Drive::AttachController(frc2::CommandXboxController *driverController) {
@@ -16,23 +17,17 @@ void Drive::AttachController(frc2::CommandXboxController *driverController) {
 }
 
 void Drive::SetPower(double x, double r, double k) {
-  Util::ramp(&curX, x * k, config.rampX);
-  Util::ramp(&curR, r * k, config.rampR);
+  Util::ramp(&curX, x * k, rampX);
+  Util::ramp(&curR, r * k, rampR);
 
-  config.motorL.ctrl->Set(curX - curR);
-  config.motorR.ctrl->Set(curX + curR);
+  m_ctrlL.Set(curX - curR);
+  m_ctrlR.Set(curX + curR);
 }
 
 void Drive::Periodic() {
   const auto x = Util::thresholded(m_driverController->GetLeftY(), 0.1, -0.1);
-  const auto r = Util::thresholded(m_driverController->GetRightX(), 0.1, -0.1);
+  const auto r = Util::thresholded(m_driverController->GetLeftX(), 0.1, -0.1);
 
   // x is negative because joystick y-axis is inverted
   SetPower(-x, r, 0.25);
-}
-
-DriveConfig::DriveConfig(Motor _motorL, Motor _motorR, double _rampX, double _rampR)
-  : motorL(_motorL), motorR(_motorR), rampX(_rampX), rampR(_rampR) {
-  motorL.ctrl->SetInverted(motorL.invert);
-  motorR.ctrl->SetInverted(motorR.invert);
 }

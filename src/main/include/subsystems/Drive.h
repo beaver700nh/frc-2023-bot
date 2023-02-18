@@ -4,31 +4,30 @@
 
 #pragma once
 
+#include <functional>
+#include <vector>
+
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
 #include <frc2/command/button/CommandXboxController.h>
 
 #include <frc/motorcontrol/MotorController.h>
+#include <frc/motorcontrol/MotorControllerGroup.h>
 
-struct Motor {
-  frc::MotorController *ctrl;
-  bool invert;
-};
+#include <ctre/phoenix/motorcontrol/can/WPI_TalonFX.h>
 
-struct DriveConfig {
-  DriveConfig(Motor motorL, Motor motorR, double rampX, double rampR);
+#include "Constants.h"
 
-  Motor motorL, motorR;
-  const double rampX, rampR;
-};
+using MotorDriver = ctre::phoenix::motorcontrol::can::WPI_TalonFX;
+using MotorCollection = std::vector<std::reference_wrapper<frc::MotorController>>;
 
 class Drive : public frc2::SubsystemBase {
 public:
-  Drive(DriveConfig config);
+  Drive(bool invertL, bool invertR, double rampX, double rampR);
 
   void AttachController(frc2::CommandXboxController *driverController);
 
-  void SetPower(double x, double r, double k = 1);
+  void SetPower(double x, double r, double k = 1.0);
 
   void Periodic();
 
@@ -37,6 +36,22 @@ private:
   // declared private and exposed only through public methods.
   frc2::CommandXboxController *m_driverController;
 
-  DriveConfig config;
+  MotorDriver m_motors[4] {
+    {CanIds::kDriveL1},
+    {CanIds::kDriveL2},
+    {CanIds::kDriveR1},
+    {CanIds::kDriveR2},
+  };
+
+#define MOTOR(n) (*(frc::MotorController *) (m_motors + (n)))
+  MotorCollection m_motorsL {MOTOR(0), MOTOR(1)};
+  MotorCollection m_motorsR {MOTOR(2), MOTOR(3)};
+#undef MOTOR
+
+  frc::MotorControllerGroup m_ctrlL {std::move(m_motorsL)};
+  frc::MotorControllerGroup m_ctrlR {std::move(m_motorsR)};
+
+  const double rampX, rampR;
+
   double curX = 0, curR = 0;
 };

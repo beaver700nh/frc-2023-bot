@@ -15,7 +15,25 @@
  */
 
 namespace OperatorConstants {
+  constexpr int kDriverControllerPort = 0;
 
-constexpr int kDriverControllerPort = 0;
+  constexpr bool kArmInvertTilt   = false;
+  constexpr bool kArmInvertRotate = false;
+  constexpr bool kArmInvertExtend = false;
 
-}  // namespace OperatorConstants
+  constexpr bool kDriveInvertL = false;
+  constexpr bool kDriveInvertR = false;
+  constexpr double kDriveRampX = 0.04;
+  constexpr double kDriveRampR = 0.04;
+}
+
+namespace CanIds {
+  constexpr int kDriveL1 = 1;
+  constexpr int kDriveL2 = 2;
+  constexpr int kDriveR1 = 3;
+  constexpr int kDriveR2 = 4;
+
+  constexpr int kArmTilt   = 6;
+  constexpr int kArmRotate = 7;
+  constexpr int kArmExtend = 8;
+}

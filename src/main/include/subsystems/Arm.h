@@ -9,18 +9,20 @@
 
 #include <rev/CANSparkMax.h>
 
+#include "Constants.h"
+
 using MotorArm = rev::CANSparkMax;
 using MotorArmType = rev::CANSparkMaxLowLevel::MotorType;
 
 class Arm : public frc2::SubsystemBase {
 public:
-  Arm(bool invert_tilt, bool invert_rotate, bool invert_extend);
+  Arm(bool invertTilt, bool invertRotate, bool invertExtend);
 
   void AttachController(frc2::CommandXboxController *driverController);
 
-  void SetTilt(double x, double k);
-  void SetRotate(double x, double k);
-  void SetExtend(double x, double k);
+  void SetTilt  (double x, double k = 1.0);
+  void SetRotate(double x, double k = 1.0);
+  void SetExtend(double x, double k = 1.0);
 
   void Periodic();
 
@@ -29,7 +31,11 @@ private:
   // declared private and exposed only through public methods.
   frc2::CommandXboxController *m_driverController;
 
-  MotorArm m_motor_tilt   {6, MotorArmType::kBrushless};
-  MotorArm m_motor_rotate {7, MotorArmType::kBrushless};
-  MotorArm m_motor_extend {8, MotorArmType::kBrushless};
+  MotorArm m_motorTilt   {CanIds::kArmTilt,   MotorArmType::kBrushless};
+  MotorArm m_motorRotate {CanIds::kArmRotate, MotorArmType::kBrushless};
+  MotorArm m_motorExtend {CanIds::kArmExtend, MotorArmType::kBrushless};
+
+  static constexpr double kTiltPower   = 1.0;
+  static constexpr double kRotatePower = 1.0;
+  static constexpr double kExtendPower = 1.0;
 };

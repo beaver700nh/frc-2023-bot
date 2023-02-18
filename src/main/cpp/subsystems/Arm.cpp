@@ -4,10 +4,10 @@
 
 #include "subsystems/Arm.h"
 
-Arm::Arm(bool invert_tilt, bool invert_rotate, bool invert_extend) {
-  m_motor_tilt  .SetInverted(invert_tilt  );
-  m_motor_rotate.SetInverted(invert_rotate);
-  m_motor_extend.SetInverted(invert_extend);
+Arm::Arm(bool invertTilt, bool invertRotate, bool invertExtend) {
+  m_motorTilt  .SetInverted(invertTilt  );
+  m_motorRotate.SetInverted(invertRotate);
+  m_motorExtend.SetInverted(invertExtend);
 }
 
 void Arm::AttachController(frc2::CommandXboxController *driverController) {
@@ -15,13 +15,25 @@ void Arm::AttachController(frc2::CommandXboxController *driverController) {
 }
 
 void Arm::SetTilt(double x, double k) {
-  m_motor_tilt
+  m_motorTilt.SetPower(x * k);
+}
+
+void Arm::SetRotate(double x, double k) {
+  m_motorRotate.SetPower(x * k);
+}
+
+void Arm::SetExtend(double x, double k) {
+  m_motorExtend.SetPower(x * k);
 }
 
 void Arm::Periodic() {
-  const auto x = Util::thresholded(m_driverController->GetLeftY(), 0.1, -0.1);
-  const auto r = Util::thresholded(m_driverController->GetRightX(), 0.1, -0.1);
+  const double tilt = Util::thresholded(m_driverController->GetRightY(), 0.1, -0.1);
+  SetTile(-tilt, Arm::kTiltPower); // tilt is negative because joystick y-axis is inverted
 
-  // x is negative because joystick y-axis is inverted
-  SetPower(-x, r, 0.25);
+  const double rotate = Util::thresholded(m_driverController->GetRightX(), 0.1, -0.1);
+  SetRotate(rotate, Arm::kRotatePower);
+
+  const double temp = m_driverController->GetLeftTriggerAxis() - m_driverController->GetRightTriggerAxis();
+  const double extend = Util::thresholded(temp, 0.1, -0.1);
+  SetExtend(extend, Arm::kExtendPower);
 }
