@@ -11,8 +11,6 @@ Drive::Drive(DriveConfig config)
   // Implementation of subsystem constructor goes here.
 }
 
-#include <iostream>
-
 void Drive::AttachController(frc2::CommandXboxController *driverController) {
   m_driverController = driverController;
 }

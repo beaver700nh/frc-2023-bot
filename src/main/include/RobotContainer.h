@@ -13,7 +13,6 @@
 #include <frc/motorcontrol/MotorControllerGroup.h>
 
 #include <ctre/phoenix/motorcontrol/can/WPI_TalonFX.h>
-#include <rev/CANSparkMax.h>
 
 #include "Constants.h"
 
@@ -24,8 +23,6 @@
 #include "commands/ExampleCommand.h"
 
 using MotorDriver = ctre::phoenix::motorcontrol::can::WPI_TalonFX;
-using MotorArm = rev::CANSparkMax;
-using MotorArmType = rev::CANSparkMaxLowLevel::MotorType;
 using MotorCollection = std::vector<std::reference_wrapper<frc::MotorController>>;
 
 /**
@@ -53,10 +50,6 @@ public:
   MotorCollection m_motors_l {MOTOR(0), MOTOR(1)};
   MotorCollection m_motors_r {MOTOR(2), MOTOR(3)};
 #undef MOTOR
-
-  MotorArm m_arm_tilt   {6, MotorArmType::kBrushless};
-  MotorArm m_arm_rotate {7, MotorArmType::kBrushless};
-  MotorArm m_arm_extend {8, MotorArmType::kBrushless};
 
   Drive m_drive {
     DriveConfig {
