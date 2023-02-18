@@ -23,6 +23,8 @@ public:
 
   void AttachController(frc2::CommandXboxController *driverController);
 
+  void Shoe();
+  void Unshoe();
   bool IsShoeDown();
 
   void Periodic() override;
@@ -34,7 +36,14 @@ private:
 
   frc::Compressor m_comp {CanIds::kPneuCtrlHub, PneuType::REVPH};
 
-  frc::DoubleSolenoid m_slnd_shoe {CanIds::kPneuCtrlHub, PneuType::REVPH, 2, 10};
-  frc::DoubleSolenoid m_slnd_claw {CanIds::kPneuCtrlHub, PneuType::REVPH, 3, 11};
-  frc::DoubleSolenoid m_slnd_gear {CanIds::kPneuCtrlHub, PneuType::REVPH, 7, 15};
+  frc::DoubleSolenoid m_slndShoe {CanIds::kPneuCtrlHub, PneuType::REVPH, 2, 10};
+  frc::DoubleSolenoid m_slndClaw {CanIds::kPneuCtrlHub, PneuType::REVPH, 3, 11};
+  frc::DoubleSolenoid m_slndGear {CanIds::kPneuCtrlHub, PneuType::REVPH, 7, 15};
+
+  SolenoidValue m_shoeOverride = SolenoidValue::kOff;
+  SolenoidValue m_shoeValue = SolenoidValue::kReverse;
+
+  void HandleShoe();
+  void HandleClaw();
+  void HandleGear();
 };

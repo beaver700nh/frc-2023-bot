@@ -32,8 +32,8 @@ void Drive::Periodic() {
     return;
   }
 
-  const auto x = Util::thresholded(m_driverController->GetLeftY(), 0.1, -0.1);
-  const auto r = Util::thresholded(m_driverController->GetLeftX(), 0.1, -0.1);
+  const auto x = Util::thresholded(m_driverController->GetLeftY(), -0.1, 0.1);
+  const auto r = Util::thresholded(m_driverController->GetLeftX(), -0.1, 0.1);
 
   // x is negative because joystick y-axis is inverted
   SetPower(-x, r, Drive::kCoeffDriveTrain);

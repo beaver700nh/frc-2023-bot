@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+#include <frc/smartdashboard/SmartDashboard.h>
+
 #include "subsystems/Arm.h"
 
 #include "Util.h"
@@ -31,9 +33,11 @@ void Arm::SetTilt(double x, double k) {
     return;
   }
 
-  if (m_pneumatics->IsShoeDown()) {
-    std::cerr << "Arm cannot tilt when shoe is down." << std::endl;
-    return;
+  if (x == 0) { // assumes x is thresholded
+    m_pneumatics->Shoe();
+  }
+  else if (m_pneumatics->IsShoeDown()) {
+    m_pneumatics->Unshoe();
   }
 
   Util::ramp(&m_curTilt, x * k, m_rampTilt);
@@ -56,13 +60,17 @@ void Arm::Periodic() {
     return;
   }
 
-  const double tilt = Util::thresholded(m_driverController->GetRightY(), 0.1, -0.1);
+  const double tilt = Util::thresholded(m_driverController->GetRightY(), -0.1, 0.1);
   SetTilt(-tilt, Arm::kCoeffTilt); // tilt is negative because joystick y-axis is inverted
 
-  const double rotate = Util::thresholded(m_driverController->GetRightX(), 0.1, -0.1);
+  const double rotate = Util::thresholded(m_driverController->GetRightX(), -0.1, 0.1);
   SetRotate(rotate, Arm::kCoeffRotate);
 
   const double temp = m_driverController->GetRightTriggerAxis() - m_driverController->GetLeftTriggerAxis();
-  const double extend = Util::thresholded(temp, 0.1, -0.1);
+  const double extend = Util::thresholded(temp, -0.1, 0.1);
   SetExtend(extend, Arm::kCoeffExtend);
+
+  frc::SmartDashboard::PutBoolean("lmswTilt",   m_lmswTilt  .Get());
+  frc::SmartDashboard::PutBoolean("lmswRotate", m_lmswRotate.Get());
+  frc::SmartDashboard::PutBoolean("lmswExtend", m_lmswExtend.Get());
 }

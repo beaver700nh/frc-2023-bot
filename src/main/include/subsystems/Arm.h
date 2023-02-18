@@ -7,6 +7,8 @@
 #include <frc2/command/SubsystemBase.h>
 #include <frc2/command/button/CommandXboxController.h>
 
+#include <frc/DigitalInput.h>
+
 #include <rev/CANSparkMax.h>
 
 #include "subsystems/Pneumatics.h"
@@ -42,6 +44,10 @@ private:
   MotorArm m_motorTilt   {CanIds::kArmTilt,   MotorArmType::kBrushless};
   MotorArm m_motorRotate {CanIds::kArmRotate, MotorArmType::kBrushless};
   MotorArm m_motorExtend {CanIds::kArmExtend, MotorArmType::kBrushless};
+
+  frc::DigitalInput m_lmswTilt   {0};
+  frc::DigitalInput m_lmswRotate {1};
+  frc::DigitalInput m_lmswExtend {2};
 
   const double m_rampTilt, m_rampRotate, m_rampExtend;
 

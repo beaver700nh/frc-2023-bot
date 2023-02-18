@@ -4,6 +4,11 @@
 
 #pragma once
 
+#define POV_UP    0
+#define POV_RIGHT 90
+#define POV_DOWN  180
+#define POV_LEFT  270
+
 /**
  * The Constants header provides a convenient place for teams to hold robot-wide
  * numerical or boolean constants.  This should not be used for any other
