@@ -36,9 +36,18 @@ private:
 
   frc::Compressor m_comp {CanIds::kPneuCtrlHub, PneuType::REVPH};
 
-  frc::DoubleSolenoid m_slndShoe {CanIds::kPneuCtrlHub, PneuType::REVPH, 2, 10};
-  frc::DoubleSolenoid m_slndClaw {CanIds::kPneuCtrlHub, PneuType::REVPH, 3, 11};
-  frc::DoubleSolenoid m_slndGear {CanIds::kPneuCtrlHub, PneuType::REVPH, 7, 15};
+  frc::DoubleSolenoid m_slndShoe {
+    CanIds::kPneuCtrlHub, PneuType::REVPH,
+    PortsPCH::kPneuSlndShoe1, PortsPCH::kPneuSlndShoe2,
+  };
+  frc::DoubleSolenoid m_slndClaw {
+    CanIds::kPneuCtrlHub, PneuType::REVPH,
+    PortsPCH::kPneuSlndClaw1, PortsPCH::kPneuSlndClaw2,
+  };
+  frc::DoubleSolenoid m_slndGear {
+    CanIds::kPneuCtrlHub, PneuType::REVPH,
+    PortsPCH::kPneuSlndGear1, PortsPCH::kPneuSlndGear2,
+  };
 
   SolenoidValue m_shoeOverride = SolenoidValue::kOff;
   SolenoidValue m_shoeValue = SolenoidValue::kReverse;

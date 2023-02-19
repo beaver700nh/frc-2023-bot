@@ -45,9 +45,9 @@ private:
   MotorArm m_motorRotate {CanIds::kArmRotate, MotorArmType::kBrushless};
   MotorArm m_motorExtend {CanIds::kArmExtend, MotorArmType::kBrushless};
 
-  frc::DigitalInput m_lmswTilt   {0};
-  frc::DigitalInput m_lmswRotate {1};
-  frc::DigitalInput m_lmswExtend {2};
+  frc::DigitalInput m_lmswTilt   {PortsDIO::kArmLmswTilt  };
+  frc::DigitalInput m_lmswRotate {PortsDIO::kArmLmswRotate};
+  frc::DigitalInput m_lmswExtend {PortsDIO::kArmLmswExtend};
 
   const double m_rampTilt, m_rampRotate, m_rampExtend;
 

@@ -47,3 +47,18 @@ namespace CanIds {
 
   constexpr int kPneuCtrlHub = 11;
 }
+
+namespace PortsDIO {
+  constexpr int kArmLmswTilt   = 0;
+  constexpr int kArmLmswRotate = 1;
+  constexpr int kArmLmswExtend = 2;
+}
+
+namespace PortsPCH {
+  constexpr int kPneuSlndShoe1 = 2;
+  constexpr int kPneuSlndShoe2 = 10;
+  constexpr int kPneuSlndClaw1 = 3;
+  constexpr int kPneuSlndClaw2 = 11;
+  constexpr int kPneuSlndGear1 = 7;
+  constexpr int kPneuSlndGear2 = 15;
+}
