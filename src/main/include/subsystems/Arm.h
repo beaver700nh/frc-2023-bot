@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
 #include <frc2/command/button/CommandXboxController.h>
 
@@ -20,31 +21,34 @@ using MotorArm = rev::CANSparkMax;
 using MotorArmType = rev::CANSparkMaxLowLevel::MotorType;
 using SparkMaxCtrlType = rev::CANSparkMax::ControlType;
 
+struct ArmComponent {
+public:
+  ArmComponent(int motorCanId, int lmswPort, double coeff, double maxPos);
+
+  void Initialize(bool invert, double p, double i, double d, double iz, double ff, double min, double max);
+  void Set(double rawControllerInput, bool inverted);
+
+  MotorArm motor;
+  rev::SparkMaxRelativeEncoder encoder;
+  rev::SparkMaxPIDController pidCtrl;
+  frc::DigitalInput lmsw;
+
+  const double m_coeff;
+  const double m_maxPos;
+};
+
 class Arm : public frc2::SubsystemBase {
 public:
-  Arm(
-    bool invertTilt, bool invertRotate, bool invertExtend,
-    double rampTilt, double rampRotate, double rampExtend
-  );
+  Arm(bool invertTilt, bool invertRotate, bool invertExtend);
 
   void AttachController(frc2::CommandXboxController *driverController);
   void AttachPneumatics(Pneumatics *pneumatics);
 
-  rev::SparkMaxPIDController *GetPIDCtrlTilt();
-  rev::SparkMaxRelativeEncoder *GetEncoderTilt();
-  MotorArm *GetMotorTilt();
-
-  void StopTilt();
-
-  void SetTilt  (double x);
-  void SetRotate(double x, double k = 1.0);
-  void SetExtend(double x, double k = 1.0);
-
   void Periodic() override;
 
-  frc::DigitalInput m_lmswTilt   {PortsDIO::kArmLmswTilt  };
-  frc::DigitalInput m_lmswRotate {PortsDIO::kArmLmswRotate};
-  frc::DigitalInput m_lmswExtend {PortsDIO::kArmLmswExtend};
+  ArmComponent m_tilt   {CanIds::kArmTilt,   PortsDIO::kArmLmswTilt,   2.5, 160.0};
+  ArmComponent m_rotate {CanIds::kArmRotate, PortsDIO::kArmLmswRotate, 1.5, 50.0};
+  ArmComponent m_extend {CanIds::kArmExtend, PortsDIO::kArmLmswExtend, 1.5, 50.0};
 
 private:
   // Components (e.g. motor controllers and sensors) should generally be
@@ -52,21 +56,4 @@ private:
   frc2::CommandXboxController *m_driverController = nullptr;
 
   Pneumatics *m_pneumatics = nullptr;
-
-  MotorArm m_motorTilt   {CanIds::kArmTilt,   MotorArmType::kBrushless};
-  MotorArm m_motorRotate {CanIds::kArmRotate, MotorArmType::kBrushless};
-  MotorArm m_motorExtend {CanIds::kArmExtend, MotorArmType::kBrushless};
-
-  rev::SparkMaxPIDController m_pidCtrlTilt = m_motorTilt.GetPIDController();
-  rev::SparkMaxRelativeEncoder m_encoderTilt = m_motorTilt.GetEncoder();
-
-  const double m_rampTilt, m_rampRotate, m_rampExtend;
-
-  double m_curRotate = 0.0, m_curExtend = 0.0;
-
-  static constexpr double kCoeffTilt   = 1.0;
-  static constexpr double kCoeffRotate = 1.0;
-  static constexpr double kCoeffExtend = 1.0;
-
-  static constexpr double kMaxTilt = 256.0;
 };

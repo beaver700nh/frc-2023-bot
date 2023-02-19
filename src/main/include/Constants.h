@@ -25,9 +25,6 @@ namespace OperatorConstants {
   constexpr bool kArmInvertTilt   = true;
   constexpr bool kArmInvertRotate = true;
   constexpr bool kArmInvertExtend = false;
-  constexpr double kArmRampTilt   = 0.04;
-  constexpr double kArmRampRotate = 0.04;
-  constexpr double kArmRampExtend = 0.04;
 
   constexpr bool kDriveInvertL = false;
   constexpr bool kDriveInvertR = true;

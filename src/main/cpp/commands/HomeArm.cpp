@@ -11,7 +11,7 @@ HomeArm::HomeArm(Arm *arm)
 }
 
 void HomeArm::Initialize() {
-  m_arm->GetMotorTilt()->Set(-0.2);
+  m_arm->m_tilt.motor.Set(-0.2);
 }
 
 void HomeArm::Execute() {
@@ -19,11 +19,11 @@ void HomeArm::Execute() {
 }
 
 void HomeArm::End(bool interrupted) {
-  m_arm->StopTilt();
-  m_arm->GetEncoderTilt()->SetPosition(0.0);
-  m_arm->GetPIDCtrlTilt()->SetReference(0.0, SparkMaxCtrlType::kPosition);
+  m_arm->m_tilt.motor.Set(0.0);
+  m_arm->m_tilt.encoder.SetPosition(0.0);
+  m_arm->m_tilt.pidCtrl.SetReference(0.0, SparkMaxCtrlType::kPosition);
 }
 
 bool HomeArm::IsFinished() {
-  return !m_arm->m_lmswTilt.Get();
+  return !m_arm->m_tilt.lmsw.Get();
 }
