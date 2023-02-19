@@ -16,6 +16,8 @@
 
 #include <ctre/phoenix/motorcontrol/can/WPI_TalonFX.h>
 
+#include <frc/drive/DifferentialDriveKinimatics.h>
+
 #include "Constants.h"
 
 using MotorDriver = ctre::phoenix::motorcontrol::can::WPI_TalonFX;
@@ -42,6 +44,8 @@ private:
     {CanIds::kDriveR1},
     {CanIds::kDriveR2},
   };
+
+  const frc::DifferentialDriveKinematics kDriveKinematics {OperatorConstants::kTrackwidth};
 
 #define MOTOR(n) (*(frc::MotorController *) (m_motors + (n)))
   MotorCollection m_motorsL {MOTOR(0), MOTOR(1)};

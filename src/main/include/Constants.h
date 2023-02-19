@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <units/length.h>
+#include <units/time.h>
+#include <units/voltage.h>
+
 #define POV_UP    0
 #define POV_RIGHT 90
 #define POV_DOWN  180
@@ -33,6 +37,19 @@ namespace OperatorConstants {
   constexpr bool kDriveInvertR = true;
   constexpr double kDriveRampX = 0.04;
   constexpr double kDriveRampR = 0.04;
+
+  constexpr auto kDriveTrajecotryS = 0.11338_V;
+  constexpr auto kDriveTrajecotryV = 0.1208 * 1_V * 1_s / 1_m;
+  constexpr auto kDriveTrajecotryA = 0.0083874 * 1_V * 1_s * 1_s / 1_m;
+  constexpr auto kDriveTrajecotryP = 0.12782;
+
+  constexpr auto kTrackwidth = 0.69_m;//TODO get real value
+
+  constexpr auto kMaxSpeed = 3_mps;
+  constexpr auto kMaxAcceleration = 1_mps_sq;
+
+  constexpr auto kRamseteB = 2.0 * 1_rad * 1_rad / (1_m * 1_m);
+  constexpr auto kRamseteZeta = 0.7 / 1_rad;
 }
 
 namespace CanIds {
