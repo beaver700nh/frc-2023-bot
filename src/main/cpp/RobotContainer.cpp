@@ -9,6 +9,7 @@
 #include <frc2/command/button/Trigger.h>
 
 #include "commands/Autos.h"
+#include "commands/HomeArm.h"
 #include "commands/ExampleCommand.h"
 
 RobotContainer::RobotContainer() {
@@ -36,6 +37,8 @@ void RobotContainer::ConfigureBindings() {
   // Schedule `ExampleMethodCommand` when the Xbox controller's B button is
   // pressed, cancelling on release.
   m_driverController.B().WhileTrue(m_subsystem.ExampleMethodCommand());
+
+  m_driverController.Y().OnTrue(HomeArm(&m_arm).ToPtr());
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {

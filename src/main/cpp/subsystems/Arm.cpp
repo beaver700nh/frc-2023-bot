@@ -17,6 +17,15 @@ Arm::Arm(
   m_motorTilt  .SetInverted(invertTilt  );
   m_motorRotate.SetInverted(invertRotate);
   m_motorExtend.SetInverted(invertExtend);
+
+  m_encoderTilt.SetPosition(0.0);
+  m_pidCtrlTilt.SetReference(0.0, SparkMaxCtrlType::kPosition);
+  m_pidCtrlTilt.SetP(1.0e-1);
+  m_pidCtrlTilt.SetI(1.0e-4);
+  m_pidCtrlTilt.SetD(1.0e0);
+  m_pidCtrlTilt.SetIZone(0);
+  m_pidCtrlTilt.SetFF(0);
+  m_pidCtrlTilt.SetOutputRange(-0.5, 0.5);
 }
 
 void Arm::AttachController(frc2::CommandXboxController *driverController) {
@@ -27,27 +36,38 @@ void Arm::AttachPneumatics(Pneumatics *pneumatics) {
   m_pneumatics = pneumatics;
 }
 
-void Arm::SetTilt(double x, double k) {
+rev::SparkMaxPIDController *Arm::GetPIDCtrlTilt() {
+  return &m_pidCtrlTilt;
+}
+
+rev::SparkMaxRelativeEncoder *Arm::GetEncoderTilt() {
+  return &m_encoderTilt;
+}
+
+MotorArm *Arm::GetMotorTilt() {
+  return &m_motorTilt;
+}
+
+void Arm::StopTilt() {
+  m_motorTilt.Set(0.0);
+}
+
+void Arm::SetTilt(double x) {
   if (!m_pneumatics) {
     std::cerr << "ERROR in Arm: pneumatics is null." << std::endl;
     return;
   }
 
-  if (x == 0) { // assumes x is thresholded
-    m_pneumatics->Shoe();
-  }
-  else if (m_pneumatics->IsShoeDown()) {
-    m_pneumatics->Unshoe();
-  }
+  // if (x == 0) { // assumes x is thresholded
+  //   m_pneumatics->Shoe();
+  // }
+  // else if (m_pneumatics->IsShoeDown()) {
+  //   m_pneumatics->Unshoe();
+  // }
 
-  Util::ramp(&m_curTilt, x * k, m_rampTilt);
-
-  if (!m_lmswTilt.Get() && x > 0) {
-    m_motorTilt.Set(0);
-  }
-  else {
-    m_motorTilt.Set(m_curTilt);
-  }
+  double constrained = Util::constrained(x, 0.0, Arm::kMaxTilt);
+  m_pidCtrlTilt.SetReference(constrained, SparkMaxCtrlType::kPosition);
+  frc::SmartDashboard::PutNumber("setPoint", constrained);
 }
 
 void Arm::SetRotate(double x, double k) {
@@ -73,7 +93,10 @@ void Arm::Periodic() {
   }
 
   const double tilt = Util::thresholded(m_driverController->GetRightY(), -0.1, 0.1);
-  SetTilt(-tilt, Arm::kCoeffTilt); // tilt is negative because joystick y-axis is inverted
+  if (tilt != 0) {
+    double curPos = m_encoderTilt.GetPosition();
+    SetTilt(curPos - 2 * tilt);
+  }
 
   const double rotate = Util::thresholded(m_driverController->GetRightX(), -0.1, 0.1);
   SetRotate(rotate, Arm::kCoeffRotate);
@@ -85,4 +108,6 @@ void Arm::Periodic() {
   frc::SmartDashboard::PutBoolean("lmswTilt",   m_lmswTilt  .Get());
   frc::SmartDashboard::PutBoolean("lmswRotate", m_lmswRotate.Get());
   frc::SmartDashboard::PutBoolean("lmswExtend", m_lmswExtend.Get());
+
+  frc::SmartDashboard::PutNumber("tiltPos", m_encoderTilt.GetPosition());
 }

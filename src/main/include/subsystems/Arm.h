@@ -9,6 +9,7 @@
 
 #include <frc/DigitalInput.h>
 
+#include <rev/SparkMaxPIDController.h>
 #include <rev/CANSparkMax.h>
 
 #include "subsystems/Pneumatics.h"
@@ -17,6 +18,7 @@
 
 using MotorArm = rev::CANSparkMax;
 using MotorArmType = rev::CANSparkMaxLowLevel::MotorType;
+using SparkMaxCtrlType = rev::CANSparkMax::ControlType;
 
 class Arm : public frc2::SubsystemBase {
 public:
@@ -28,11 +30,21 @@ public:
   void AttachController(frc2::CommandXboxController *driverController);
   void AttachPneumatics(Pneumatics *pneumatics);
 
-  void SetTilt  (double x, double k = 1.0);
+  rev::SparkMaxPIDController *GetPIDCtrlTilt();
+  rev::SparkMaxRelativeEncoder *GetEncoderTilt();
+  MotorArm *GetMotorTilt();
+
+  void StopTilt();
+
+  void SetTilt  (double x);
   void SetRotate(double x, double k = 1.0);
   void SetExtend(double x, double k = 1.0);
 
   void Periodic() override;
+
+  frc::DigitalInput m_lmswTilt   {PortsDIO::kArmLmswTilt  };
+  frc::DigitalInput m_lmswRotate {PortsDIO::kArmLmswRotate};
+  frc::DigitalInput m_lmswExtend {PortsDIO::kArmLmswExtend};
 
 private:
   // Components (e.g. motor controllers and sensors) should generally be
@@ -45,15 +57,16 @@ private:
   MotorArm m_motorRotate {CanIds::kArmRotate, MotorArmType::kBrushless};
   MotorArm m_motorExtend {CanIds::kArmExtend, MotorArmType::kBrushless};
 
-  frc::DigitalInput m_lmswTilt   {PortsDIO::kArmLmswTilt  };
-  frc::DigitalInput m_lmswRotate {PortsDIO::kArmLmswRotate};
-  frc::DigitalInput m_lmswExtend {PortsDIO::kArmLmswExtend};
+  rev::SparkMaxPIDController m_pidCtrlTilt = m_motorTilt.GetPIDController();
+  rev::SparkMaxRelativeEncoder m_encoderTilt = m_motorTilt.GetEncoder();
 
   const double m_rampTilt, m_rampRotate, m_rampExtend;
 
-  double m_curTilt = 0.0, m_curRotate = 0.0, m_curExtend = 0.0;
+  double m_curRotate = 0.0, m_curExtend = 0.0;
 
   static constexpr double kCoeffTilt   = 1.0;
   static constexpr double kCoeffRotate = 1.0;
   static constexpr double kCoeffExtend = 1.0;
+
+  static constexpr double kMaxTilt = 256.0;
 };
