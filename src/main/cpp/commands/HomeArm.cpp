@@ -4,26 +4,46 @@
 
 #include "commands/HomeArm.h"
 
-HomeArm::HomeArm(Arm *arm)
+HomeArmTilt::HomeArmTilt(Arm *arm)
   : m_arm(arm) {
   // Register that this command requires the subsystem.
   AddRequirements(m_arm);
 }
 
-void HomeArm::Initialize() {
+void HomeArmTilt::Initialize() {
   m_arm->m_tilt.motor.Set(-0.2);
 }
 
-void HomeArm::Execute() {
+void HomeArmTilt::Execute() {
   // empty
 }
 
-void HomeArm::End(bool interrupted) {
-  m_arm->m_tilt.motor.Set(0.0);
-  m_arm->m_tilt.encoder.SetPosition(0.0);
-  m_arm->m_tilt.pidCtrl.SetReference(0.0, SparkMaxCtrlType::kPosition);
+void HomeArmTilt::End(bool interrupted) {
+  m_arm->m_tilt.Reset();
 }
 
-bool HomeArm::IsFinished() {
+bool HomeArmTilt::IsFinished() {
   return !m_arm->m_tilt.lmsw.Get();
+}
+
+HomeArmExtend::HomeArmExtend(Arm *arm)
+  : m_arm(arm) {
+  // Register that this command requires the subsystem.
+  AddRequirements(m_arm);
+}
+
+void HomeArmExtend::Initialize() {
+  m_arm->m_extend.motor.Set(-0.2);
+}
+
+void HomeArmExtend::Execute() {
+  // empty
+}
+
+void HomeArmExtend::End(bool interrupted) {
+  m_arm->m_extend.Reset();
+}
+
+bool HomeArmExtend::IsFinished() {
+  return !m_arm->m_extend.lmsw.Get();
 }

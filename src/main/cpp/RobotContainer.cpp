@@ -38,7 +38,8 @@ void RobotContainer::ConfigureBindings() {
   // pressed, cancelling on release.
   m_driverController.B().WhileTrue(m_subsystem.ExampleMethodCommand());
 
-  m_driverController.Y().OnTrue(HomeArm(&m_arm).ToPtr());
+  m_driverController.X().OnTrue(HomeArmTilt(&m_arm).ToPtr());
+  m_driverController.Y().OnTrue(HomeArmExtend(&m_arm).ToPtr());
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {

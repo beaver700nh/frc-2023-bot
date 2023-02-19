@@ -27,6 +27,7 @@ public:
 
   void Initialize(bool invert, double p, double i, double d, double iz, double ff, double min, double max);
   void Set(double rawControllerInput, bool inverted);
+  void Reset();
 
   MotorArm motor;
   rev::SparkMaxRelativeEncoder encoder;

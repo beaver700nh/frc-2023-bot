@@ -72,3 +72,9 @@ void ArmComponent::Set(double rawControllerInput, bool inverted) {
 
   pidCtrl.SetReference(constrained, SparkMaxCtrlType::kPosition);
 }
+
+void ArmComponent::Reset() {
+  motor.Set(0.0);
+  encoder.SetPosition(0.0);
+  pidCtrl.SetReference(0.0, SparkMaxCtrlType::kPosition);
+}
