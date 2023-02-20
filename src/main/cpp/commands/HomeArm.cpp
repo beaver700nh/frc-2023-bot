@@ -26,6 +26,28 @@ bool HomeArmTilt::IsFinished() {
   return !m_arm->m_tilt.lmsw.Get();
 }
 
+HomeArmRotate::HomeArmRotate(Arm *arm)
+  : m_arm(arm) {
+  // Register that this command requires the subsystem.
+  AddRequirements(m_arm);
+}
+
+void HomeArmRotate::Initialize() {
+  m_arm->m_rotate.motor.Set(-0.2);
+}
+
+void HomeArmRotate::Execute() {
+  // empty
+}
+
+void HomeArmRotate::End(bool interrupted) {
+  m_arm->m_rotate.Reset(-13.0);
+}
+
+bool HomeArmRotate::IsFinished() {
+  return !m_arm->m_rotate.lmsw.Get();
+}
+
 HomeArmExtend::HomeArmExtend(Arm *arm)
   : m_arm(arm) {
   // Register that this command requires the subsystem.

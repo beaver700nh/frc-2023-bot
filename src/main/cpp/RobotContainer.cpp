@@ -40,6 +40,7 @@ void RobotContainer::ConfigureBindings() {
 
   m_driverController.X().OnTrue(HomeArmTilt(&m_arm).ToPtr());
   m_driverController.Y().OnTrue(HomeArmExtend(&m_arm).ToPtr());
+  m_driverController.Start().OnTrue(HomeArmRotate(&m_arm).ToPtr());
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {

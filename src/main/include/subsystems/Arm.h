@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
 #include <frc2/command/button/CommandXboxController.h>
@@ -23,19 +25,24 @@ using SparkMaxCtrlType = rev::CANSparkMax::ControlType;
 
 struct ArmComponent {
 public:
-  ArmComponent(int motorCanId, int lmswPort, double coeff, double maxPos);
+  ArmComponent(int motorCanId, int lmswPort, double coeff, double minPos, double maxPos);
+
+  struct MoveInfo {
+    double position, adjusted, constrained;
+  };
 
   void Initialize(bool invert, double p, double i, double d, double iz, double ff, double min, double max);
-  void Set(double rawControllerInput, bool inverted);
-  void Reset();
+  std::optional<MoveInfo> Set(double rawControllerInput, bool inverted);
+  void Reset(double pos = 0.0);
 
   MotorArm motor;
   rev::SparkMaxRelativeEncoder encoder;
   rev::SparkMaxPIDController pidCtrl;
   frc::DigitalInput lmsw;
 
-  const double m_coeff;
-  const double m_maxPos;
+  const double coeff;
+  const double minPos;
+  const double maxPos;
 };
 
 class Arm : public frc2::SubsystemBase {
@@ -47,9 +54,9 @@ public:
 
   void Periodic() override;
 
-  ArmComponent m_tilt   {CanIds::kArmTilt,   PortsDIO::kArmLmswTilt,   2.5, 160.0};
-  ArmComponent m_rotate {CanIds::kArmRotate, PortsDIO::kArmLmswRotate, 1.5, 50.0};
-  ArmComponent m_extend {CanIds::kArmExtend, PortsDIO::kArmLmswExtend, 1.5, 50.0};
+  ArmComponent m_tilt   {CanIds::kArmTilt,   PortsDIO::kArmLmswTilt,   2.5, 0.0, 160.0};
+  ArmComponent m_rotate {CanIds::kArmRotate, PortsDIO::kArmLmswRotate, 1.5, -125.0, 125.0};
+  ArmComponent m_extend {CanIds::kArmExtend, PortsDIO::kArmLmswExtend, 1.5, 0.0, 115.0};
 
 private:
   // Components (e.g. motor controllers and sensors) should generally be

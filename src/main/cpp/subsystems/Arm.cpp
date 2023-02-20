@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <cmath>
 #include <iostream>
 
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -31,18 +32,28 @@ void Arm::Periodic() {
   }
 
   const double tilt = m_driverController->GetRightY();
-  m_tilt.Set(tilt, true);
+  auto info = m_tilt.Set(tilt, true);
+
+  if (info.has_value()) {
+    if (std::abs(info.value().position - info.value().constrained) >= 2.2) {
+      m_pneumatics->Unshoe();
+    }
+    else {
+      m_pneumatics->Shoe();
+    }
+  }
 
   const double rotate = m_driverController->GetRightX();
-  m_rotate.Set(rotate, false);
+  auto temp1 = m_rotate.Set(rotate, false);
+  if (temp1.has_value()) frc::SmartDashboard::PutNumber("rotate", temp1.value().position);
 
   const double extend = m_driverController->GetRightTriggerAxis() - m_driverController->GetLeftTriggerAxis();
   m_extend.Set(extend, false);
 }
 
-ArmComponent::ArmComponent(int motorCanId, int lmswPort, double coeff, double maxPos) :
+ArmComponent::ArmComponent(int motorCanId, int lmswPort, double coeff, double minPos, double maxPos) :
   motor(motorCanId, MotorArmType::kBrushless), encoder(motor.GetEncoder()), pidCtrl(motor.GetPIDController()),
-  lmsw(lmswPort), m_coeff(coeff), m_maxPos(maxPos) {
+  lmsw(lmswPort), coeff(coeff), minPos(minPos), maxPos(maxPos) {
   // empty
 }
 
@@ -60,21 +71,24 @@ void ArmComponent::Initialize(bool invert, double p, double i, double d, double 
   pidCtrl.SetOutputRange(min, max);
 }
 
-void ArmComponent::Set(double rawControllerInput, bool inverted) {
-  const double thresholded = Util::thresholded(rawControllerInput, -0.06, 0.06);
+std::optional<ArmComponent::MoveInfo> ArmComponent::Set(double rawControllerInput, bool inverted) {
+  const double thresholded = Util::thresholded(rawControllerInput, -0.08, 0.08);
+
+  const double position = encoder.GetPosition();
+  const double adjusted = position + coeff * thresholded * (inverted ? -1.0 : 1.0);
+  const double constrained = Util::constrained(adjusted, minPos, maxPos);
 
   if (thresholded == 0) {
-    return;
+    return std::nullopt;
   }
 
-  const double position = encoder.GetPosition() + m_coeff * thresholded * (inverted ? -1.0 : 1.0);
-  const double constrained = Util::constrained(position, 0.0, m_maxPos);
-
   pidCtrl.SetReference(constrained, SparkMaxCtrlType::kPosition);
+
+  return MoveInfo {position, adjusted, constrained};
 }
 
-void ArmComponent::Reset() {
+void ArmComponent::Reset(double pos) {
   motor.Set(0.0);
-  encoder.SetPosition(0.0);
-  pidCtrl.SetReference(0.0, SparkMaxCtrlType::kPosition);
+  encoder.SetPosition(pos);
+  pidCtrl.SetReference(pos, SparkMaxCtrlType::kPosition);
 }
