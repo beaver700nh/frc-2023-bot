@@ -1,0 +1,29 @@
+Controls
+========
+
+Drive X
+- A LeftStick Y
+Drive R
+- A RightStick X
+Arm Tilt
+- B LeftStick Y
+Arm Rotate
+- B RightStick X
+Arm Extend
+- B Triggers
+Gear Switch
+- A Bumpers
+Claw Open/Close
+- B Bumpers
+Home Tilt
+- B Button X
+Home Rotate
+- B Button A
+Home Extend
+- B Button B
+Shoe Override Disable
+- A POV Up
+Shoe Override On
+- A POV Left
+Shoe Override Off
+- A POV Right

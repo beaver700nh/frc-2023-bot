@@ -14,8 +14,9 @@ Pneumatics::Pneumatics() {
   m_slndClaw.Set(SolenoidValue::kForward);
 }
 
-void Pneumatics::AttachController(frc2::CommandXboxController *driverController) {
-  m_driverController = driverController;
+void Pneumatics::AttachController(frc2::CommandXboxController *driverControllerA, frc2::CommandXboxController *driverControllerB) {
+  m_driverControllerA = driverControllerA;
+  m_driverControllerB = driverControllerB;
 }
 
 void Pneumatics::Shoe() {
@@ -39,7 +40,7 @@ bool Pneumatics::IsShoeDown() {
 }
 
 void Pneumatics::Periodic() {
-  if (!m_driverController) {
+  if (!m_driverControllerA || !m_driverControllerB) {
     std::cerr << "ERROR in Pneumatics: driverController is null." << std::endl;
     return;
   }
@@ -50,13 +51,13 @@ void Pneumatics::Periodic() {
 }
 
 void Pneumatics::HandleShoe() {
-  if (m_driverController->GetPOV() == POV_UP) {
+  if (m_driverControllerA->GetPOV() == POV_UP) {
     m_shoeOverride = SolenoidValue::kOff;
   }
-  else if (m_driverController->GetPOV() == POV_LEFT) {
+  else if (m_driverControllerA->GetPOV() == POV_LEFT) {
     m_shoeOverride = SolenoidValue::kForward;
   }
-  else if (m_driverController->GetPOV() == POV_RIGHT) {
+  else if (m_driverControllerA->GetPOV() == POV_RIGHT) {
     m_shoeOverride = SolenoidValue::kReverse;
   }
 
@@ -69,19 +70,19 @@ void Pneumatics::HandleShoe() {
 }
 
 void Pneumatics::HandleClaw() {
-  if (m_driverController->GetAButtonPressed()) {
+  if (m_driverControllerB->GetLeftBumperPressed()) {
     m_slndClaw.Set(SolenoidValue::kForward);
   }
-  else if (m_driverController->GetBButtonPressed()) {
+  else if (m_driverControllerB->GetRightBumperPressed()) {
     m_slndClaw.Set(SolenoidValue::kReverse);
   }
 }
 
 void Pneumatics::HandleGear() {
-  if (m_driverController->GetLeftBumperPressed()) {
+  if (m_driverControllerA->GetLeftBumperPressed()) {
     m_slndGear.Set(SolenoidValue::kForward);
   }
-  else if (m_driverController->GetRightBumperPressed()) {
+  else if (m_driverControllerA->GetRightBumperPressed()) {
     m_slndGear.Set(SolenoidValue::kReverse);
   }
 }

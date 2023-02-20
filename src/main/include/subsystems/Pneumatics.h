@@ -21,7 +21,7 @@ class Pneumatics : public frc2::SubsystemBase {
 public:
   Pneumatics();
 
-  void AttachController(frc2::CommandXboxController *driverController);
+  void AttachController(frc2::CommandXboxController *driverControllerA, frc2::CommandXboxController *driverControllerB);
 
   void Shoe();
   void Unshoe();
@@ -32,7 +32,8 @@ public:
 private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
-  frc2::CommandXboxController *m_driverController = nullptr;
+  frc2::CommandXboxController *m_driverControllerA = nullptr;
+  frc2::CommandXboxController *m_driverControllerB = nullptr;
 
   frc::Compressor m_comp {CanIds::kPneuCtrlHub, PneuType::REVPH};
 

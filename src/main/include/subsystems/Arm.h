@@ -49,7 +49,7 @@ class Arm : public frc2::SubsystemBase {
 public:
   Arm(bool invertTilt, bool invertRotate, bool invertExtend);
 
-  void AttachController(frc2::CommandXboxController *driverController);
+  void AttachController(frc2::CommandXboxController *driverControllerA, frc2::CommandXboxController *driverControllerB);
   void AttachPneumatics(Pneumatics *pneumatics);
 
   void Periodic() override;
@@ -61,7 +61,8 @@ public:
 private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
-  frc2::CommandXboxController *m_driverController = nullptr;
+  frc2::CommandXboxController *m_driverControllerA = nullptr;
+  frc2::CommandXboxController *m_driverControllerB = nullptr;
 
   Pneumatics *m_pneumatics = nullptr;
 };

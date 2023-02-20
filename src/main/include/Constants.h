@@ -20,7 +20,8 @@
  */
 
 namespace OperatorConstants {
-  constexpr int kDriverControllerPort = 0;
+  constexpr int kDriverControllerAPort = 0;
+  constexpr int kDriverControllerBPort = 1;
 
   constexpr bool kArmInvertTilt   = true;
   constexpr bool kArmInvertRotate = true;

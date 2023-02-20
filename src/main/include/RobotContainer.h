@@ -30,9 +30,8 @@ public:
   frc2::CommandPtr GetAutonomousCommand();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  frc2::CommandXboxController m_driverController {
-    OperatorConstants::kDriverControllerPort,
-  };
+  frc2::CommandXboxController m_driverControllerA {OperatorConstants::kDriverControllerAPort};
+  frc2::CommandXboxController m_driverControllerB {OperatorConstants::kDriverControllerBPort};
 
   // The robot's subsystems are defined here...
   ExampleSubsystem m_subsystem;

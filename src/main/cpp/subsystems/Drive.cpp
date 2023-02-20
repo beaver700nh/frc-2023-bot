@@ -14,8 +14,9 @@ Drive::Drive(bool invertL, bool invertR, double rampX, double rampR)
   m_ctrlR.SetInverted(invertR);
 }
 
-void Drive::AttachController(frc2::CommandXboxController *driverController) {
-  m_driverController = driverController;
+void Drive::AttachController(frc2::CommandXboxController *driverControllerA, frc2::CommandXboxController *driverControllerB) {
+  m_driverControllerA = driverControllerA;
+  m_driverControllerB = driverControllerB;
 }
 
 void Drive::SetPower(double x, double r, double k) {
@@ -27,13 +28,13 @@ void Drive::SetPower(double x, double r, double k) {
 }
 
 void Drive::Periodic() {
-  if (!m_driverController) {
+  if (!m_driverControllerA || !m_driverControllerB) {
     std::cerr << "ERROR in Drive: driverController is null." << std::endl;
     return;
   }
 
-  const auto x = Util::thresholded(m_driverController->GetLeftY(), -0.1, 0.1);
-  const auto r = Util::thresholded(m_driverController->GetLeftX(), -0.1, 0.1);
+  const auto x = Util::thresholded(m_driverControllerA->GetLeftY(), -0.1, 0.1);
+  const auto r = Util::thresholded(m_driverControllerA->GetRightX(), -0.1, 0.1);
 
   // x is negative because joystick y-axis is inverted
   SetPower(-x, r, Drive::kCoeffDriveTrain);

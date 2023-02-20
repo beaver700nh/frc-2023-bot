@@ -16,9 +16,9 @@ RobotContainer::RobotContainer() {
   std::cerr << "HELLO WORLD! - Brian" << std::endl;
 
   // Initialize all of your commands and subsystems here
-  m_arm.AttachController(&m_driverController);
-  m_drive.AttachController(&m_driverController);
-  m_pneu.AttachController(&m_driverController);
+  m_arm  .AttachController(&m_driverControllerA, &m_driverControllerB);
+  m_drive.AttachController(&m_driverControllerA, &m_driverControllerB);
+  m_pneu .AttachController(&m_driverControllerA, &m_driverControllerB);
 
   m_arm.AttachPneumatics(&m_pneu);
 
@@ -36,11 +36,9 @@ void RobotContainer::ConfigureBindings() {
 
   // Schedule `ExampleMethodCommand` when the Xbox controller's B button is
   // pressed, cancelling on release.
-  m_driverController.B().WhileTrue(m_subsystem.ExampleMethodCommand());
-
-  m_driverController.X().OnTrue(HomeArmTilt(&m_arm).ToPtr());
-  m_driverController.Y().OnTrue(HomeArmExtend(&m_arm).ToPtr());
-  m_driverController.Start().OnTrue(HomeArmRotate(&m_arm).ToPtr());
+  m_driverControllerB.X().OnTrue(HomeArmTilt  (&m_arm).ToPtr());
+  m_driverControllerB.A().OnTrue(HomeArmRotate(&m_arm).ToPtr());
+  m_driverControllerB.B().OnTrue(HomeArmExtend(&m_arm).ToPtr());
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {

@@ -17,8 +17,9 @@ Arm::Arm(bool invertTilt, bool invertRotate, bool invertExtend) {
   m_extend.Initialize(invertExtend, 1.0e-1, 1.0e-4, 1.0e+0, 0.0, 0.0, -0.5, 0.5);
 }
 
-void Arm::AttachController(frc2::CommandXboxController *driverController) {
-  m_driverController = driverController;
+void Arm::AttachController(frc2::CommandXboxController *driverControllerA, frc2::CommandXboxController *driverControllerB) {
+  m_driverControllerA = driverControllerA;
+  m_driverControllerB = driverControllerB;
 }
 
 void Arm::AttachPneumatics(Pneumatics *pneumatics) {
@@ -26,12 +27,12 @@ void Arm::AttachPneumatics(Pneumatics *pneumatics) {
 }
 
 void Arm::Periodic() {
-  if (!m_driverController) {
+  if (!m_driverControllerA || !m_driverControllerB) {
     std::cerr << "ERROR in Arm: driverController is null." << std::endl;
     return;
   }
 
-  const double tilt = m_driverController->GetRightY();
+  const double tilt = m_driverControllerB->GetLeftY();
   auto info = m_tilt.Set(tilt, true);
 
   if (info.has_value()) {
@@ -43,11 +44,10 @@ void Arm::Periodic() {
     }
   }
 
-  const double rotate = m_driverController->GetRightX();
-  auto temp1 = m_rotate.Set(rotate, false);
-  if (temp1.has_value()) frc::SmartDashboard::PutNumber("rotate", temp1.value().position);
+  const double rotate = m_driverControllerB->GetRightX();
+  m_rotate.Set(rotate, false);
 
-  const double extend = m_driverController->GetRightTriggerAxis() - m_driverController->GetLeftTriggerAxis();
+  const double extend = m_driverControllerB->GetRightTriggerAxis() - m_driverControllerB->GetLeftTriggerAxis();
   m_extend.Set(extend, false);
 }
 
