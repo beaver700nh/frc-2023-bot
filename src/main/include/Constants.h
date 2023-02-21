@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <units/length.h>
+
 #define POV_UP    0
 #define POV_RIGHT 90
 #define POV_DOWN  180
@@ -31,6 +33,13 @@ namespace OperatorConstants {
   constexpr bool kDriveInvertR = true;
   constexpr double kDriveRampX = 0.04;
   constexpr double kDriveRampR = 0.04;
+
+  constexpr int kDriveEncoderTicksPerRev = 2048;
+  constexpr double kDriveHighGearRatio = 20.833; // ratio for slow speed
+  constexpr double kDriveLowGearRatio = 9.167; // ratio for fast speed
+  constexpr auto kDriveWheelDiameter = 6.0_in;
+
+  constexpr auto kDriveBaseEncoderDistancePerPulse = units::meter_t(kDriveWheelDiameter * M_PI / kDriveEncoderTicksPerRev);
 }
 
 namespace CanIds {

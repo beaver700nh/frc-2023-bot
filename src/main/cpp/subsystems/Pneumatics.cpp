@@ -39,6 +39,13 @@ bool Pneumatics::IsShoeDown() {
   return m_slndShoe.Get() == SolenoidValue::kForward;
 }
 
+/**
+ * High gear is the slow speed (based on gear ratio)
+ */
+bool Pneumatics::IsHighGear() {
+  return m_slndGear.Get() == SolenoidValue::kForward;
+}
+
 void Pneumatics::Periodic() {
   if (!m_driverControllerA || !m_driverControllerB) {
     std::cerr << "ERROR in Pneumatics: driverController is null." << std::endl;

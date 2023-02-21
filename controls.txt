@@ -5,14 +5,18 @@ Drive X
 - A LeftStick Y
 Drive R
 - A RightStick X
+**TEMP**
+Reset Odometry
+- A Button A
+Gear Switch
+- A Bumpers
+
 Arm Tilt
 - B LeftStick Y
 Arm Rotate
 - B RightStick X
 Arm Extend
 - B Triggers
-Gear Switch
-- A Bumpers
 Claw Open/Close
 - B Bumpers
 Home Tilt
@@ -21,6 +25,9 @@ Home Rotate
 - B Button A
 Home Extend
 - B Button B
+**TEMP**
+Turn To Zero
+- B Button Y
 Shoe Override Disable
 - A POV Up
 Shoe Override On

@@ -27,6 +27,8 @@ public:
   void Unshoe();
   bool IsShoeDown();
 
+  bool IsHighGear();
+
   void Periodic() override;
 
 private:

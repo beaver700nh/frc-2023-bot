@@ -20,7 +20,10 @@ RobotContainer::RobotContainer() {
   m_drive.AttachController(&m_driverControllerA, &m_driverControllerB);
   m_pneu .AttachController(&m_driverControllerA, &m_driverControllerB);
 
-  m_arm.AttachPneumatics(&m_pneu);
+  m_arm  .AttachPneumatics(&m_pneu);
+  m_drive.AttachPneumatics(&m_pneu);
+
+  m_arm  .AttachDrive(&m_drive);
 
   // Configure the button bindings
   ConfigureBindings();

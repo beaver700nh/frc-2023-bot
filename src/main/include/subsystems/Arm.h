@@ -15,6 +15,7 @@
 #include <rev/SparkMaxPIDController.h>
 #include <rev/CANSparkMax.h>
 
+#include "subsystems/Drive.h"
 #include "subsystems/Pneumatics.h"
 
 #include "Constants.h"
@@ -33,6 +34,7 @@ public:
 
   void Initialize(bool invert, double p, double i, double d, double iz, double ff, double min, double max);
   std::optional<MoveInfo> Set(double rawControllerInput, bool inverted);
+  void SetAbsolute(double pos);
   void Reset(double pos = 0.0);
 
   MotorArm motor;
@@ -51,6 +53,7 @@ public:
 
   void AttachController(frc2::CommandXboxController *driverControllerA, frc2::CommandXboxController *driverControllerB);
   void AttachPneumatics(Pneumatics *pneumatics);
+  void AttachDrive(Drive *drive);
 
   void Periodic() override;
 
@@ -65,4 +68,9 @@ private:
   frc2::CommandXboxController *m_driverControllerB = nullptr;
 
   Pneumatics *m_pneumatics = nullptr;
+
+  Drive *m_drive = nullptr;
+
+  void PointTo(frc::Translation2d);
+  void PointToZero();
 };
