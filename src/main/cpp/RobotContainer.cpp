@@ -46,5 +46,9 @@ void RobotContainer::ConfigureBindings() {
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // An example command will be run in autonomous
-  return autos::ExampleAuto(&m_subsystem);
+  // return autos::ExampleAuto(&m_subsystem);
+  return Movement::GenerateCommand(
+    &m_drive,
+    frc::Pose2d(0.0_m, 3.0_m, 90_deg)
+  );
 }

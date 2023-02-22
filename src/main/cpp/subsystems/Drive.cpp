@@ -5,7 +5,6 @@
 #include <iostream>
 
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/Timer.h>
 
 #include "subsystems/Drive.h"
 
@@ -37,8 +36,13 @@ void Drive::SetPower(double x, double r, double k) {
   Util::ramp(&m_curX, x * k, m_rampX);
   Util::ramp(&m_curR, r * k, m_rampR);
 
-  m_ctrlL.Set(m_curX - m_curR);
-  m_ctrlR.Set(m_curX + m_curR);
+  m_drive.ArcadeDrive(m_curX, m_curR);
+}
+
+void Drive::SetVolts(units::volt_t left, units::volt_t right) {
+  m_ctrlL.SetVoltage(left);
+  m_ctrlR.SetVoltage(right);
+  m_drive.Feed();
 }
 
 void Drive::Periodic() {
@@ -74,6 +78,9 @@ void Drive::Periodic() {
 
   frc::SmartDashboard::PutString("left info", m_leftInfo.toString());
   frc::SmartDashboard::PutString("right info", m_rightInfo.toString());
+
+  frc::SmartDashboard::PutNumber("wheel left", GetWheelSpeeds().left.to<double>());
+  frc::SmartDashboard::PutNumber("wheel right", GetWheelSpeeds().right.to<double>());
 }
 
 void Drive::HandleController() {
@@ -84,10 +91,6 @@ void Drive::HandleController() {
   SetPower(-x, r, Drive::kCoeffDriveTrain);
 }
 
-void Drive::SetControllerControllable(bool value) {
-  m_controllerControllable = value;
-}
-
 units::meter_t Drive::EncoderTicksToMeterFactor(){
   return (
     OperatorConstants::kDriveBaseEncoderDistancePerPulse /
@@ -95,13 +98,9 @@ units::meter_t Drive::EncoderTicksToMeterFactor(){
   );
 }
 
-void Drive::Calculate(){
-  auto time = frc::Timer::GetFPGATimestamp();
-  auto diff = time - m_lastUpdateTime;
-  m_lastUpdateTime = time;
-  
-  m_leftInfo.calculate((m_motors[0].GetSelectedSensorPosition() + m_motors[1].GetSelectedSensorPosition()) / 2.0, EncoderTicksToMeterFactor(), diff);
-  m_rightInfo.calculate((m_motors[2].GetSelectedSensorPosition() + m_motors[3].GetSelectedSensorPosition()) / 2.0, EncoderTicksToMeterFactor(), diff);
+void Drive::Calculate() {
+  m_leftInfo.calculate(m_motors + 0, m_motors + 1, EncoderTicksToMeterFactor());
+  m_rightInfo.calculate(m_motors + 2, m_motors + 3, EncoderTicksToMeterFactor());
 }
 
 const WheelOdometryInfo &Drive::GetLeftInfo() {
@@ -110,6 +109,10 @@ const WheelOdometryInfo &Drive::GetLeftInfo() {
 
 const WheelOdometryInfo &Drive::GetRightInfo() {
   return m_rightInfo;
+}
+
+frc::DifferentialDriveWheelSpeeds Drive::GetWheelSpeeds() {
+  return {m_leftInfo.velocity, m_rightInfo.velocity};
 }
 
 frc::Pose2d Drive::GetPosition() {
@@ -127,13 +130,24 @@ void Drive::ResetOdometry(frc::Pose2d start, bool calibrateImu) {
     motor.SetSelectedSensorPosition(0.0);
   }
 
+  m_leftInfo.reset();
+  m_rightInfo.reset();
+
   m_odometry.ResetPosition(m_imu.GetAngle(), 0.0_m, 0.0_m, start);
 }
 
-void WheelOdometryInfo::calculate(double encoderTicks, units::meter_t tickToMeterFactor, units::second_t deltaTime) {
+void WheelOdometryInfo::calculate(MotorDriver *motorFront, MotorDriver *motorRear, units::meter_t tickToMeterFactor) {
+  double encoderTicks = (motorFront->GetSelectedSensorPosition() + motorRear->GetSelectedSensorPosition()) / 2.0;
   units::meter_t dist = (encoderTicks - lastEncoderTicks) * tickToMeterFactor;
-  velocity = dist / deltaTime;
   distance += dist;
 
+  velocity = (motorFront->GetSelectedSensorVelocity() + motorRear->GetSelectedSensorVelocity()) / 2.0 * tickToMeterFactor / 100_ms;
+
   lastEncoderTicks = encoderTicks;
+}
+
+void WheelOdometryInfo::reset(double encoderPosition) {
+  lastEncoderTicks = encoderPosition;
+  distance = 0_m;
+  velocity = 0_mps;
 }

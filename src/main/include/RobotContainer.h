@@ -6,6 +6,8 @@
 
 #include <frc2/command/CommandPtr.h>
 
+#include "Movement.h"
+
 #include "Constants.h"
 
 #include "subsystems/Arm.h"

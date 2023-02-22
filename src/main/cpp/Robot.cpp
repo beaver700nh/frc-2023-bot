@@ -58,12 +58,19 @@ void Robot::TeleopInit() {
   if (m_autonomousCommand) {
     m_autonomousCommand->Cancel();
   }
+
+  m_container.m_drive.m_controllerControllable = true; //ensure controllers can drive robot
 }
 
 /**
  * This function is called periodically during operator control.
  */
-void Robot::TeleopPeriodic() {}
+void Robot::TeleopPeriodic() {
+  if (m_container.m_driverControllerA.GetYButtonPressed()) {
+    m_autonomousCommand = m_container.GetAutonomousCommand();
+    m_autonomousCommand->Schedule();
+  }
+}
 
 /**
  * This function is called periodically during test mode.

@@ -5,6 +5,11 @@
 #pragma once
 
 #include <units/length.h>
+#include <units/voltage.h>
+#include <units/time.h>
+#include <units/velocity.h>
+#include <units/acceleration.h>
+#include <units/angle.h>
 
 #define POV_UP    0
 #define POV_RIGHT 90
@@ -29,17 +34,33 @@ namespace OperatorConstants {
   constexpr bool kArmInvertRotate = true;
   constexpr bool kArmInvertExtend = false;
 
+  // Drive
   constexpr bool kDriveInvertL = false;
   constexpr bool kDriveInvertR = true;
   constexpr double kDriveRampX = 0.04;
   constexpr double kDriveRampR = 0.04;
 
+  // Odometry
   constexpr int kDriveEncoderTicksPerRev = 2048;
   constexpr double kDriveHighGearRatio = 20.833; // ratio for slow speed
   constexpr double kDriveLowGearRatio = 9.167; // ratio for fast speed
   constexpr auto kDriveWheelDiameter = 6.0_in;
-
   constexpr auto kDriveBaseEncoderDistancePerPulse = units::meter_t(kDriveWheelDiameter * M_PI / kDriveEncoderTicksPerRev);
+
+  // Trajectory
+  constexpr auto kDriveTrajectoryS = 0.086036_V;
+  constexpr auto kDriveTrajectoryV = 2.3038 * 1_V * 1_s / 1_m;
+  constexpr auto kDriveTrajectoryA = 0.096615 * 1_V * 1_s * 1_s / 1_m;
+  constexpr auto kDriveTrajectoryP = 0.37882;
+
+  constexpr auto kTrackwidth = 22.5_in;
+
+  constexpr auto kMaxVoltage = 10_V;
+  constexpr auto kMaxSpeed = 3_mps;
+  constexpr auto kMaxAcceleration = 1_mps_sq;
+
+  constexpr auto kRamseteB = 2.0 * 1_rad * 1_rad / (1_m * 1_m);
+  constexpr auto kRamseteZeta = 0.7 / 1_rad;
 }
 
 namespace CanIds {
