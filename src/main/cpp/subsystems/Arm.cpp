@@ -31,22 +31,9 @@ void Arm::AttachDrive(Drive *drive) {
 }
 
 void Arm::Periodic() {
-  if (!m_driverControllerA || !m_driverControllerB) {
-    std::cerr << "ERROR in Arm: driverController is null." << std::endl;
-    return;
-  }
-
   const double tilt = m_driverControllerB->GetLeftY();
   auto info = m_tilt.Set(tilt, true);
-
-  if (info.has_value()) {
-    if (std::abs(info.value().position - info.value().constrained) >= 2.2) {
-      m_pneumatics->Unshoe();
-    }
-    else {
-      m_pneumatics->Shoe();
-    }
-  }
+  AutoShoe(info);
 
   const double rotate = m_driverControllerB->GetRightX();
   m_rotate.Set(rotate, false);
@@ -54,38 +41,52 @@ void Arm::Periodic() {
   const double extend = m_driverControllerB->GetRightTriggerAxis() - m_driverControllerB->GetLeftTriggerAxis();
   m_extend.Set(extend, false);
 
-  if(m_driverControllerB->GetYButtonReleased())
-    m_rotate.SetAbsolute(m_rotate.encoder.GetPosition());
-  else if(m_driverControllerB->GetYButton())
+  if (m_driverControllerB->GetYButton()) {
     PointToZero();
+  }
+  else if (m_driverControllerB->GetYButtonReleased()) {
+    m_rotate.SetAbsolute(m_rotate.encoder.GetPosition());
+  }
 
-  frc::SmartDashboard::PutNumber("curr rotate pos", m_rotate.encoder.GetPosition());
-  frc::SmartDashboard::PutBoolean("lmsw tilt", m_tilt.lmsw.Get());
-  frc::SmartDashboard::PutBoolean("lmsw rotate", m_rotate.lmsw.Get());
-  frc::SmartDashboard::PutBoolean("lmsw extend", m_extend.lmsw.Get());
+  frc::SmartDashboard::PutBoolean("Lim.Sw. Tilt",   m_tilt  .lmsw.Get());
+  frc::SmartDashboard::PutBoolean("Lim.Sw. Rotate", m_rotate.lmsw.Get());
+  frc::SmartDashboard::PutBoolean("Lim.Sw. Extend", m_extend.lmsw.Get());
+}
+
+void Arm::AutoShoe(std::optional<ArmComponent::MoveInfo> info) {
+  if (!info.has_value()) {
+    return;
+  }
+
+  if (std::abs(info.value().position - info.value().constrained) >= 2.2) {
+    m_pneumatics->Unshoe();
+  }
+  else {
+    m_pneumatics->Shoe();
+  }
 }
 
 void Arm::PointTo(frc::Translation2d target){
   frc::Pose2d pos = m_drive->GetPosition();
 
   // Convert to distance from robot
-  frc::Translation2d target_cord = target - pos.Translation();  
+  frc::Translation2d targetCord = target - pos.Translation();
 
-  double angToTarget = - std::atan2(target_cord.Y().to<double>(), target_cord.X().to<double>());
-  frc::SmartDashboard::PutNumber("base ang to targ", angToTarget);
+  double baseAngle = -std::atan2(targetCord.Y().to<double>(), targetCord.X().to<double>());
+  double scaledAngle = Util::scaleAngleRad(baseAngle + pos.Rotation().Radians().to<double>());
 
-  angToTarget = Util::scaleAngleRad(angToTarget + pos.Rotation().Radians().to<double>());
-  frc::SmartDashboard::PutNumber("final ang to targ", angToTarget);
+  // Map angle to rotator ticks
+  double mapping = (m_rotate.maxPos - m_rotate.minPos) / (2 * M_PI);
+  double final = scaledAngle * mapping;
 
-  double scale = (m_rotate.maxPos - m_rotate.minPos) / (2 * M_PI);
+  m_rotate.SetAbsolute(final);
 
-  frc::SmartDashboard::PutNumber("set point", scale * angToTarget);
-
-  m_rotate.SetAbsolute(angToTarget * scale);
+  frc::SmartDashboard::PutNumber("Target Angle", scaledAngle);
+  frc::SmartDashboard::PutNumber("Target Encoder", final);
 }
 
 void Arm::PointToZero(){
-  PointTo(frc::Translation2d());
+  PointTo({});
 }
 
 ArmComponent::ArmComponent(int motorCanId, int lmswPort, double coeff, double minPos, double maxPos) :
@@ -111,13 +112,13 @@ void ArmComponent::Initialize(bool invert, double p, double i, double d, double 
 std::optional<ArmComponent::MoveInfo> ArmComponent::Set(double rawControllerInput, bool inverted) {
   const double thresholded = Util::thresholded(rawControllerInput, -0.08, 0.08);
 
-  const double position = encoder.GetPosition();
-  const double adjusted = position + coeff * thresholded * (inverted ? -1.0 : 1.0);
-  const double constrained = Util::constrained(adjusted, minPos, maxPos);
-
   if (thresholded == 0) {
     return std::nullopt;
   }
+
+  const double position = encoder.GetPosition();
+  const double adjusted = position + coeff * thresholded * (inverted ? -1.0 : 1.0);
+  const double constrained = Util::constrained(adjusted, minPos, maxPos);
 
   pidCtrl.SetReference(constrained, SparkMaxCtrlType::kPosition);
 
@@ -126,6 +127,7 @@ std::optional<ArmComponent::MoveInfo> ArmComponent::Set(double rawControllerInpu
 
 void ArmComponent::SetAbsolute(double pos) { 
   const double constrained = Util::constrained(pos, minPos, maxPos);
+
   pidCtrl.SetReference(constrained, SparkMaxCtrlType::kPosition);
 }
 

@@ -44,7 +44,9 @@ void Robot::AutonomousInit() {
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
   if (m_autonomousCommand) {
+    std::cerr << "HELLOOOO\n";
     m_autonomousCommand->Schedule();
+    std::cerr << "HELLOOOO\n";
   }
 }
 
@@ -65,12 +67,7 @@ void Robot::TeleopInit() {
 /**
  * This function is called periodically during operator control.
  */
-void Robot::TeleopPeriodic() {
-  if (m_container.m_driverControllerA.GetYButtonPressed()) {
-    m_autonomousCommand = m_container.GetAutonomousCommand();
-    m_autonomousCommand->Schedule();
-  }
-}
+void Robot::TeleopPeriodic() {}
 
 /**
  * This function is called periodically during test mode.

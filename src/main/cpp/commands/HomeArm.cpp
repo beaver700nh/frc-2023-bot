@@ -4,8 +4,7 @@
 
 #include "commands/HomeArm.h"
 
-HomeArmTilt::HomeArmTilt(Arm *arm)
-  : m_arm(arm) {
+HomeArmTilt::HomeArmTilt(Arm *arm) : m_arm(arm) {
   // Register that this command requires the subsystem.
   AddRequirements(m_arm);
 }

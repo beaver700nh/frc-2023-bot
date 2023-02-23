@@ -41,13 +41,13 @@ namespace Util {
     return var;
   }
 
-  auto scaleAngleDeg(auto angle){
+  auto scaleAngleDeg(auto angle) {
     angle = std::fmod(angle, 360);
     angle -= (angle > 180) ? 360 : (angle < -180) ? -360 : 0;
     return angle;
   }
 
-  auto scaleAngleRad(auto angle){
+  auto scaleAngleRad(auto angle) {
     angle = std::fmod(angle, (M_PI * 2));
     angle -= (angle > M_PI) ? M_PI * 2 : (angle < -M_PI) ? -M_PI * 2 : 0;
     return angle;

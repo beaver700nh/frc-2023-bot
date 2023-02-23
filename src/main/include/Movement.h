@@ -4,13 +4,12 @@
 
 #pragma once
 
-#include <frc/trajectory/constraint/DifferentialDriveVoltageConstraint.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
+#include <frc/trajectory/constraint/DifferentialDriveVoltageConstraint.h>
 #include <frc/trajectory/TrajectoryConfig.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/smartdashboard/Field2d.h>
-
 
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/RamseteCommand.h>
@@ -19,17 +18,32 @@
 
 #include "Constants.h"
 
-namespace Movement {
-  frc2::CommandPtr GenerateCommand(Drive *drive, std::vector<frc::Translation2d> waypoints, frc::Pose2d end);
-  frc2::CommandPtr GenerateCommand(Drive *drive, frc::Pose2d end);
+class Movement {
+public:
+  Movement(Drive *drive);
 
-  const frc::DifferentialDriveKinematics kinematics {OperatorConstants::kTrackwidth};
-  const frc::SimpleMotorFeedforward<units::meters> feedForward {
-    OperatorConstants::kDriveTrajectoryS,
-    OperatorConstants::kDriveTrajectoryV,
-    OperatorConstants::kDriveTrajectoryA
+  frc2::CommandPtr GenerateCommand(std::vector<frc::Translation2d> waypoints, frc::Pose2d end);
+  frc2::CommandPtr GenerateCommand(frc::Pose2d end);
+
+private:
+  Drive *m_drive;
+  bool m_wasControllerControlled = false;
+
+  inline static const frc::SimpleMotorFeedforward<units::meters> feedForward {
+    DriveConstants::kDriveTrajectoryS,
+    DriveConstants::kDriveTrajectoryV,
+    DriveConstants::kDriveTrajectoryA,
   };
-  const frc::DifferentialDriveVoltageConstraint voltageConstraint{
-    feedForward, kinematics, OperatorConstants::kMaxVoltage
+
+  inline static const frc::DifferentialDriveKinematics kinematics {DriveConstants::kTrackwidth};
+
+  inline static const frc::DifferentialDriveVoltageConstraint voltageConstraint {
+    feedForward, kinematics, DriveConstants::kMaxVoltage
   };
-}
+
+  inline static frc::TrajectoryConfig trajectoryConfig {DriveConstants::kMaxSpeed, DriveConstants::kMaxAcceleration};
+  inline static bool trajectoryConfigInitialized = false;
+
+  inline static frc::RamseteController ramseteController {DriveConstants::kRamseteB, DriveConstants::kRamseteZeta};
+  inline static bool ramseteControllerInitialized = false;
+};

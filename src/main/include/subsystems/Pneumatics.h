@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <string>
+
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
 #include <frc2/command/button/CommandXboxController.h>
@@ -16,6 +18,8 @@
 
 using PneuType = frc::PneumaticsModuleType;
 using SolenoidValue = frc::DoubleSolenoid::Value;
+
+std::string solenoidValueToString(SolenoidValue value);
 
 class Pneumatics : public frc2::SubsystemBase {
 public:

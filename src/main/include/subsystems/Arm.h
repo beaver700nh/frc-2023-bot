@@ -42,9 +42,7 @@ public:
   rev::SparkMaxPIDController pidCtrl;
   frc::DigitalInput lmsw;
 
-  const double coeff;
-  const double minPos;
-  const double maxPos;
+  const double coeff, minPos, maxPos;
 };
 
 class Arm : public frc2::SubsystemBase {
@@ -56,6 +54,9 @@ public:
   void AttachDrive(Drive *drive);
 
   void Periodic() override;
+
+  void PointTo(frc::Translation2d target);
+  void PointToZero();
 
   ArmComponent m_tilt   {CanIds::kArmTilt,   PortsDIO::kArmLmswTilt,   2.5, 0.0, 160.0};
   ArmComponent m_rotate {CanIds::kArmRotate, PortsDIO::kArmLmswRotate, 1.5, -125.0, 125.0};
@@ -71,6 +72,5 @@ private:
 
   Drive *m_drive = nullptr;
 
-  void PointTo(frc::Translation2d);
-  void PointToZero();
+  void AutoShoe(std::optional<ArmComponent::MoveInfo> info);
 };

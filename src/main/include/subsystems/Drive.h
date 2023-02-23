@@ -31,24 +31,13 @@
 using MotorDriver = ctre::phoenix::motorcontrol::can::WPI_TalonFX;
 
 struct WheelOdometryInfo {
-  double lastEncoderTicks = 0.0;
-  units::meter_t distance = 0_m;
-  units::meters_per_second_t velocity = 0_mps;
+  double lastPosition = 0.0; // in encoder ticks
+  units::meter_t distance = 0.0_m;
+  units::meters_per_second_t velocity = 0.0_mps;
 
-  void calculate(MotorDriver *motorFront, MotorDriver *motorRear, units::meter_t tickToMeterFactor);
-
-  void reset(double encoderPosition = 0.0);
-
-  std::string toString() {
-    std::stringstream ss;
-    ss <<
-      "WheelOdometryInfo{" <<
-      "lastEncoderTicks=" << lastEncoderTicks << ", " <<
-      "distance=" << distance.to<double>() << ", " <<
-      "velocity=" << velocity.to<double>() <<
-      "}";
-    return ss.str();
-  } 
+  void Calculate(double curPosition, double curVelocity, units::meter_t tickToMeterFactor);
+  void Reset(double encoderPosition = 0.0);
+  std::string Stringify();
 };
 
 class Drive : public frc2::SubsystemBase {
@@ -63,12 +52,13 @@ public:
 
   void Periodic() override;
 
+  void Calculate();
+
   frc::Pose2d GetPosition();
 
-  const WheelOdometryInfo &GetLeftInfo();
-  const WheelOdometryInfo &GetRightInfo();
-
   frc::DifferentialDriveWheelSpeeds GetWheelSpeeds();
+
+  void ResetOdometry(frc::Pose2d start = kStartPos, bool calibrateImu = false);
 
   bool m_controllerControllable = true;
 
@@ -90,33 +80,28 @@ private:
   frc::MotorControllerGroup m_ctrlL {m_motors[0], m_motors[1]};
   frc::MotorControllerGroup m_ctrlR {m_motors[2], m_motors[3]};
   frc::DifferentialDrive m_drive {m_ctrlL, m_ctrlR};
-  
-  const double m_rampX, m_rampR;
-
-  double m_curX = 0.0, m_curR = 0.0;
-
-  static constexpr double kCoeffDriveTrain = 1.0;
 
   frc::ADIS16470_IMU m_imu {};
 
   WheelOdometryInfo m_leftInfo;
   WheelOdometryInfo m_rightInfo;
 
-  units::second_t m_lastUpdateTime;
-
-  static constexpr frc::Pose2d kStartPos {0_in ,0_in, 90_deg};//{-84_in, -84_in, 90_deg};
+  static constexpr frc::Pose2d kStartPos {0.0_in, 0.0_in, 90.0_deg};
 
   frc::DifferentialDriveOdometry m_odometry {
     frc::Rotation2d(units::radian_t(m_imu.GetAngle())),
-    0.0_m, 0.0_m,
-    kStartPos
+    0.0_m, 0.0_m, kStartPos
   };
 
-  units::meter_t EncoderTicksToMeterFactor();
+  const double m_rampX, m_rampR;
+  double m_curX = 0.0, m_curR = 0.0;
 
-  void Calculate();
-
-  void ResetOdometry(frc::Pose2d start = kStartPos, bool calibrateImu = false);
+  static constexpr double kCoeffDriveTrain = 1.0;
 
   void HandleController();
+
+  units::meter_t GetEncoderTicksToMeterFactor();
+
+  double GetAverageMotorPosition(int front, int rear);
+  double GetAverageMotorVelocity(int front, int rear);
 };
