@@ -31,6 +31,9 @@ void Drive::AttachPneumatics(Pneumatics *pneumatics) {
 }
 
 void Drive::SetPower(double x, double r, double k) {
+  m_pneumatics->SetGear(x > 0.8);
+    
+
   Util::ramp(&m_curX, x * k, m_rampX);
   Util::ramp(&m_curR, r * k, m_rampR);
 
@@ -52,6 +55,10 @@ void Drive::Periodic() {
     ResetOdometry(kStartPos, true);
   }
 
+  if(m_driverControllerA->GetBButtonPressed()){
+    SetUsePosition(!m_usePosition);
+  }
+
   Calculate();
 
   m_odometry.Update(
@@ -68,6 +75,8 @@ void Drive::Periodic() {
   frc::SmartDashboard::PutNumber("Pos. X", m_odometry.GetPose().Translation().X().to<double>());
   frc::SmartDashboard::PutNumber("Pos. Y", m_odometry.GetPose().Translation().Y().to<double>());
   frc::SmartDashboard::PutNumber("Pos. A", m_odometry.GetPose().Rotation().Degrees().to<double>());
+
+  frc::SmartDashboard::PutBoolean("Balance Mode", m_usePosition);
 }
 
 void Drive::Calculate() {
@@ -93,6 +102,8 @@ void Drive::ResetOdometry(frc::Pose2d start, bool calibrateImu) {
 
   for (auto &motor : m_motors) {
     motor.SetSelectedSensorPosition(0.0);
+    if(m_usePosition)
+      AddPositionToMotor(&motor, 0);
   }
 
   m_leftInfo.Reset();
@@ -106,7 +117,25 @@ void Drive::HandleController() {
   const auto r = Util::thresholded(m_driverControllerA->GetRightX(), -0.1, 0.1);
 
   // x is negative because joystick y-axis is inverted
-  SetPower(-x, r, Drive::kCoeffDriveTrain);
+  if(m_usePosition){
+    // if(x == 0 && r == 0){
+    //   if(!m_motorsSetToPosition){
+    //     for(MotorDriver &motor : m_motors)
+    //       AddPositionToMotor(&motor, 0);
+    //     m_motorsSetToPosition = true;
+    //   }
+
+    //   m_drive.Feed();
+    // } else {
+    //   SetPower(-x, r, Drive::kCoeffDriveTrain);
+    //   m_motorsSetToPosition = false;
+    // }
+
+    MoveUsingPosition(-x,r);
+  } else {
+    SetPower(-x, -r, Drive::kCoeffDriveTrain);
+    m_motorsSetToPosition = false;
+  }
 }
 
 units::meter_t Drive::GetEncoderTicksToMeterFactor(){
@@ -124,16 +153,89 @@ double Drive::GetAverageMotorVelocity(int front, int rear) {
   return (m_motors[front].GetSelectedSensorVelocity() + m_motors[rear].GetSelectedSensorVelocity()) / 2.0;
 }
 
+void Drive::InitializeMotorPID(MotorDriver *motor){
+  std::cout << "config motor :( \n";
+
+
+  motor->ConfigSelectedFeedbackSensor(ctre::phoenix::motorcontrol::FeedbackDevice::IntegratedSensor);
+
+		/*
+		 * Talon FX does not need sensor phase set for its integrated sensor
+		 * This is because it will always be correct if the selected feedback device is integrated sensor (default value)
+		 * and the user calls getSelectedSensor* to get the sensor's position/velocity.
+		 */
+    //motor->SetSensorPhase(false);
+
+		/* Config the peak and nominal outputs, 12V means full */
+		motor->ConfigNominalOutputForward(0);
+		motor->ConfigNominalOutputReverse(0);
+		motor->ConfigPeakOutputForward(kDriveGains.peakOutput);
+		motor->ConfigPeakOutputReverse(-kDriveGains.peakOutput);
+
+		/**
+		 * Config the allowable closed-loop error, Closed-Loop output will be
+		 * neutral within this range. See Table in Section 17.2.1 for native
+		 * units per rotation.
+		 */
+		motor->ConfigAllowableClosedloopError(0, 512);
+
+		/* Config Position Closed Loop gains in slot0, tsypically kF stays zero. */
+		motor->Config_kF(0, kDriveGains.f);
+		motor->Config_kP(0, kDriveGains.p);
+		motor->Config_kI(0, kDriveGains.i);
+		motor->Config_kD(0, kDriveGains.d);
+    motor->Config_IntegralZone(0, kDriveGains.iZone);
+
+    //sets target position to current position
+    AddPositionToMotor(motor, 0);
+}
+
+void Drive::InitializePID(){
+  std::cout << "initialize pid \n";
+  for(MotorDriver &motor : m_motors) {
+    InitializeMotorPID(&motor);
+  }
+}
+
+void Drive::SetUsePosition(bool value){
+  if(value) InitializePID();
+
+  m_usePosition = value;
+}
+
+bool Drive::GetUsePosition(){
+  return m_usePosition;
+}
+
+void Drive::AddPositionToMotor(MotorDriver* motor, int amount){
+  std::cout << "add to motor, amount: " << amount << ", curr pos: " << motor->GetSelectedSensorPosition() << " \n";
+  motor -> Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, motor->GetSelectedSensorPosition() + amount);
+}
+
+void Drive::MoveUsingPosition(double x, double r){
+  m_drive.Feed();
+  
+  if(x == 0 && r == 0) return;
+
+  x *= maxEncoderSpeed;
+  r *= maxEncoderSpeed;
+
+  AddPositionToMotor(m_motors + 0, x + r);
+  AddPositionToMotor(m_motors + 1, x + r);
+  AddPositionToMotor(m_motors + 2, x - r);
+  AddPositionToMotor(m_motors + 3, x - r);
+}
+
 void WheelOdometryInfo::Calculate(double curPosition, double curVelocity, units::meter_t tickToMeterFactor) {
-  lastPosition = curPosition;
   distance += (curPosition - lastPosition) * tickToMeterFactor;
   velocity = curVelocity * tickToMeterFactor / 100.0_ms;
+  lastPosition = curPosition;
 }
 
 void WheelOdometryInfo::Reset(double encoderPosition) {
-  lastPosition = encoderPosition;
   distance = 0.0_m;
   velocity = 0.0_mps;
+  lastPosition = encoderPosition;
 }
 
 std::string WheelOdometryInfo::Stringify() {

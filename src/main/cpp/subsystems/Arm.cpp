@@ -12,8 +12,8 @@
 #include "Util.h"
 
 Arm::Arm(bool invertTilt, bool invertRotate, bool invertExtend) {
-  m_tilt  .Initialize(invertTilt,   1.0e-1, 1.0e-4, 1.0e+0, 0.0, 0.0, -0.5, 0.5);
-  m_rotate.Initialize(invertRotate, 1.0e-1, 1.0e-4, 1.0e+0, 0.0, 0.0, -0.2, 0.2);
+  m_tilt  .Initialize(invertTilt,   1.0e-1, 1.0e-5, 1.0e+0, 0.0, 0.0, -0.5, 0.5);
+  m_rotate.Initialize(invertRotate, 1.0e-1, 1.0e-5, 1.0e+0, 0.0, 0.0, -0.35, 0.35);
   m_extend.Initialize(invertExtend, 1.0e-1, 1.0e-4, 1.0e+0, 0.0, 0.0, -0.5, 0.5);
 }
 
@@ -41,16 +41,28 @@ void Arm::Periodic() {
   const double extend = m_driverControllerB->GetRightTriggerAxis() - m_driverControllerB->GetLeftTriggerAxis();
   m_extend.Set(extend, false);
 
-  if (m_driverControllerB->GetYButton()) {
-    PointToZero();
-  }
-  else if (m_driverControllerB->GetYButtonReleased()) {
-    m_rotate.SetAbsolute(m_rotate.encoder.GetPosition());
-  }
+  m_tilt.CheckTolerance();
+
+  // if (m_driverControllerB->GetYButton()) {
+  //   PointToZero();
+  // }
+  // else if (m_driverControllerB->GetYButtonReleased()) {
+  //   m_rotate.SetAbsolute(m_rotate.encoder.GetPosition());
+  // }
 
   frc::SmartDashboard::PutBoolean("Lim.Sw. Tilt",   m_tilt  .lmsw.Get());
   frc::SmartDashboard::PutBoolean("Lim.Sw. Rotate", m_rotate.lmsw.Get());
   frc::SmartDashboard::PutBoolean("Lim.Sw. Extend", m_extend.lmsw.Get());
+
+  frc::SmartDashboard::PutNumber("Enc. Tilt", m_tilt.encoder.GetPosition());
+  frc::SmartDashboard::PutNumber("Enc. Rotate", m_rotate.encoder.GetPosition());
+  frc::SmartDashboard::PutNumber("Enc. Extend", m_extend.encoder.GetPosition());
+
+  frc::SmartDashboard::PutBoolean("Arm In Position", InTolerance());
+}
+
+bool Arm::InTolerance(){
+  return m_tilt.InTolerance() && m_rotate.InTolerance() && m_extend.InTolerance();
 }
 
 void Arm::AutoShoe(std::optional<ArmComponent::MoveInfo> info) {
@@ -72,26 +84,30 @@ void Arm::PointTo(frc::Translation2d target){
   // Convert to distance from robot
   frc::Translation2d targetCord = target - pos.Translation();
 
-  double baseAngle = -std::atan2(targetCord.Y().to<double>(), targetCord.X().to<double>());
-  double scaledAngle = Util::scaleAngleRad(baseAngle + pos.Rotation().Radians().to<double>());
+  units::radian_t baseAngle {-std::atan2(targetCord.Y().to<double>(), targetCord.X().to<double>())};
 
-  // Map angle to rotator ticks
-  double mapping = (m_rotate.maxPos - m_rotate.minPos) / (2 * M_PI);
-  double final = scaledAngle * mapping;
-
-  m_rotate.SetAbsolute(final);
-
-  frc::SmartDashboard::PutNumber("Target Angle", scaledAngle);
-  frc::SmartDashboard::PutNumber("Target Encoder", final);
+  TurnArmToAngle(baseAngle + pos.Rotation().Radians());
 }
 
-void Arm::PointToZero(){
+void Arm::PointToZero() {
   PointTo({});
 }
 
-ArmComponent::ArmComponent(int motorCanId, int lmswPort, double coeff, double minPos, double maxPos) :
+void Arm::PointToAngle(units::radian_t angle){
+  TurnArmToAngle(angle + (m_drive->GetPosition().Rotation().Radians() - units::radian_t{M_PI_2}));
+}
+
+double Arm::GetEncoderForAngle(units::radian_t angle){
+  return Util::scaleAngle(angle).to<double>() * rotateScaleFactor;
+}
+
+void Arm::TurnArmToAngle(units::radian_t angle) {
+  m_rotate.SetAbsolute(GetEncoderForAngle(angle));
+}
+
+ArmComponent::ArmComponent(int motorCanId, int lmswPort, double coeff, double minPos, double maxPos, double tolerance, int timesInTolReq) :
   motor(motorCanId, MotorArmType::kBrushless), encoder(motor.GetEncoder()), pidCtrl(motor.GetPIDController()),
-  lmsw(lmswPort), coeff(coeff), minPos(minPos), maxPos(maxPos) {
+  lmsw(lmswPort), coeff(coeff), minPos(minPos), maxPos(maxPos), tolerance(tolerance), timesInTolReq(timesInTolReq) {
   // empty
 }
 
@@ -100,7 +116,7 @@ void ArmComponent::Initialize(bool invert, double p, double i, double d, double 
 
   encoder.SetPosition(0.0);
 
-  pidCtrl.SetReference(0.0, SparkMaxCtrlType::kPosition);
+  SetAbsolute(0.0);
   pidCtrl.SetP(p);
   pidCtrl.SetI(i);
   pidCtrl.SetD(d);
@@ -118,21 +134,35 @@ std::optional<ArmComponent::MoveInfo> ArmComponent::Set(double rawControllerInpu
 
   const double position = encoder.GetPosition();
   const double adjusted = position + coeff * thresholded * (inverted ? -1.0 : 1.0);
-  const double constrained = Util::constrained(adjusted, minPos, maxPos);
 
-  pidCtrl.SetReference(constrained, SparkMaxCtrlType::kPosition);
-
-  return MoveInfo {position, adjusted, constrained};
+  return MoveInfo {position, adjusted, SetAbsolute(adjusted)};
 }
 
-void ArmComponent::SetAbsolute(double pos) { 
+double ArmComponent::SetAbsolute(double pos) { 
   const double constrained = Util::constrained(pos, minPos, maxPos);
 
   pidCtrl.SetReference(constrained, SparkMaxCtrlType::kPosition);
+  targetPosition = constrained;
+
+  return constrained;
 }
 
 void ArmComponent::Reset(double pos) {
   motor.Set(0.0);
-  encoder.SetPosition(pos);
-  pidCtrl.SetReference(pos, SparkMaxCtrlType::kPosition);
+  encoder.SetPosition(SetAbsolute(pos));
+}
+
+void ArmComponent::CheckTolerance(){
+  if(std::abs(targetPosition - encoder.GetPosition()) <= tolerance)
+    timesInTol ++;
+  else 
+    timesInTol = 0;
+}
+
+/**
+ * This will call CheckTolerance so if you are calling this repetedly there is no need to call CheckTolerance
+*/
+bool ArmComponent::InTolerance(){
+  CheckTolerance();
+  return timesInTol >= timesInTolReq;
 }

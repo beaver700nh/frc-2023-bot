@@ -6,6 +6,8 @@
 
 #include <cmath>
 
+#include <units/angle.h>
+
 namespace Util {
   int ramp(auto *var, auto target, auto tick) {
     if (*var < target) {
@@ -41,15 +43,5 @@ namespace Util {
     return var;
   }
 
-  auto scaleAngleDeg(auto angle) {
-    angle = std::fmod(angle, 360);
-    angle -= (angle > 180) ? 360 : (angle < -180) ? -360 : 0;
-    return angle;
-  }
-
-  auto scaleAngleRad(auto angle) {
-    angle = std::fmod(angle, (M_PI * 2));
-    angle -= (angle > M_PI) ? M_PI * 2 : (angle < -M_PI) ? -M_PI * 2 : 0;
-    return angle;
-  }
+  units::radian_t scaleAngle(units::radian_t angle);
 };

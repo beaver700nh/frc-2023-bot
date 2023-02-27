@@ -1,65 +1,43 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
-#include <iostream>
-
 #include "Movement.h"
 
-Movement::Movement(Drive *drive) : m_drive(drive) {
-  std::cerr << "A\n";
+frc2::CommandPtr Movement::GenerateCommand(Drive *drive, std::vector<frc::Translation2d> waypoints, frc::Pose2d end) {
+  frc::TrajectoryConfig config {
+    DriveConstants::kMaxSpeed,
+    DriveConstants::kMaxAcceleration
+  };
 
-  if (!trajectoryConfigInitialized) {
-    trajectoryConfig.SetKinematics(kinematics);
-    trajectoryConfig.AddConstraint(voltageConstraint);
-    trajectoryConfigInitialized = true;
-  }
+  config.SetKinematics(kinematics);
+  config.AddConstraint(voltageConstraint);
 
-  std::cerr << "B\n";
-
-  if (!ramseteControllerInitialized) {
-    ramseteController.SetTolerance({1.0_m, 1.0_m, 5.0_deg});
-    ramseteControllerInitialized = true;
-  }
-
-  std::cerr << "C\n";
-}
-
-frc2::CommandPtr Movement::GenerateCommand(std::vector<frc::Translation2d> waypoints, frc::Pose2d end) {
-  std::cerr << "1\n";
-
-  auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(m_drive->GetPosition(), waypoints, end, trajectoryConfig);
-
-  std::cerr << "2\n";
+  auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
+    drive->GetPosition(), waypoints, end, config
+  );
 
   frc2::RamseteCommand command {
     trajectory,
-    std::bind(&Drive::GetPosition, m_drive),
-    ramseteController, feedForward, kinematics,
-    std::bind(&Drive::GetWheelSpeeds, m_drive),
+    [drive] { return drive->GetPosition(); },
+    frc::RamseteController(DriveConstants::kRamseteB, DriveConstants::kRamseteZeta),
+    feedForward, kinematics,
+    [drive] { return drive->GetWheelSpeeds(); },
     frc2::PIDController(DriveConstants::kDriveTrajectoryP, 0, 0),
     frc2::PIDController(DriveConstants::kDriveTrajectoryP, 0, 0),
-    [this](auto left, auto right) { m_drive->SetVolts(right, left); },
-    {m_drive}
+    [drive](auto left, auto right) { drive->SetVolts(left, right); },
+    {drive}
   };
 
-  std::cerr << "3\n";
-
   return std::move(command).BeforeStarting(
-    [this] { 
-      m_drive->SetVolts(0_V, 0_V); 
-      m_wasControllerControlled = m_drive->m_controllerControllable;
-      m_drive->m_controllerControllable = false;
-      std::cerr << "X\n";
+    [drive] { 
+      drive->SetVolts(0_V, 0_V); 
+      wasControlled = drive->m_controllerControllable;
+      drive->m_controllerControllable = false;
     }
   ).AndThen(
-    [this] {
-      m_drive->m_controllerControllable = m_wasControllerControlled;
-      std::cerr << "Y\n";
+    [drive]{
+      drive->m_controllerControllable = wasControlled;
     }
   );
 }
 
-frc2::CommandPtr Movement::GenerateCommand(frc::Pose2d end) {
-  return GenerateCommand({}, end);
+frc2::CommandPtr Movement::GenerateCommand(Drive *drive, frc::Pose2d end) {
+  return GenerateCommand(drive, {}, end);
 }

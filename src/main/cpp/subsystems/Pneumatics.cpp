@@ -13,8 +13,8 @@
 
 Pneumatics::Pneumatics() {
   m_slndShoe.Set(SolenoidValue::kReverse);
-  m_slndClaw.Set(SolenoidValue::kForward);
-  m_slndGear.Set(SolenoidValue::kReverse);
+  m_slndClaw.Set(SolenoidValue::kReverse);
+  m_slndGear.Set(SolenoidValue::kForward);
 }
 
 void Pneumatics::AttachController(frc2::CommandXboxController *driverControllerA, frc2::CommandXboxController *driverControllerB) {
@@ -43,22 +43,26 @@ bool Pneumatics::IsHighGear() {
   return m_slndGear.Get() == SolenoidValue::kForward;
 }
 
+void Pneumatics::SetGear(bool highGear){
+  return m_slndGear.Set(highGear ? SolenoidValue::kReverse : SolenoidValue::kForward);
+}
+
 void Pneumatics::Periodic() {
   HandleShoe();
   HandleClaw();
-  HandleGear();
+  // HandleGear();
 }
 
 void Pneumatics::HandleShoe() {
-  if (m_driverControllerA->GetPOV() == POV_UP) {
-    m_shoeOverride = SolenoidValue::kOff;
-  }
-  else if (m_driverControllerA->GetPOV() == POV_LEFT) {
-    m_shoeOverride = SolenoidValue::kForward;
-  }
-  else if (m_driverControllerA->GetPOV() == POV_RIGHT) {
-    m_shoeOverride = SolenoidValue::kReverse;
-  }
+  // if (m_driverControllerA->GetPOV() == POV_UP) {
+  //   m_shoeOverride = SolenoidValue::kOff;
+  // }
+  // else if (m_driverControllerA->GetPOV() == POV_LEFT) {
+  //   m_shoeOverride = SolenoidValue::kForward;
+  // }
+  // else if (m_driverControllerA->GetPOV() == POV_RIGHT) {
+  //   m_shoeOverride = SolenoidValue::kReverse;
+  // }
 
   if (m_shoeOverride == SolenoidValue::kOff) {
     m_slndShoe.Set(m_shoeValue);

@@ -30,6 +30,15 @@
 
 using MotorDriver = ctre::phoenix::motorcontrol::can::WPI_TalonFX;
 
+struct Gains {
+  const double p;
+  const double i;
+  const double d;
+  const double f;
+  const int iZone;
+  const double peakOutput;
+};
+
 struct WheelOdometryInfo {
   double lastPosition = 0.0; // in encoder ticks
   units::meter_t distance = 0.0_m;
@@ -77,6 +86,8 @@ private:
     {CanIds::kDriveR2},
   };
 
+  
+
   frc::MotorControllerGroup m_ctrlL {m_motors[0], m_motors[1]};
   frc::MotorControllerGroup m_ctrlR {m_motors[2], m_motors[3]};
   frc::DifferentialDrive m_drive {m_ctrlL, m_ctrlR};
@@ -86,7 +97,7 @@ private:
   WheelOdometryInfo m_leftInfo;
   WheelOdometryInfo m_rightInfo;
 
-  static constexpr frc::Pose2d kStartPos {0.0_in, 0.0_in, 90.0_deg};
+  static constexpr frc::Pose2d kStartPos {-56.5_in, 0_m, 90.0_deg};
 
   frc::DifferentialDriveOdometry m_odometry {
     frc::Rotation2d(units::radian_t(m_imu.GetAngle())),
@@ -96,7 +107,12 @@ private:
   const double m_rampX, m_rampR;
   double m_curX = 0.0, m_curR = 0.0;
 
+  bool m_usePosition = false;
+  bool m_motorsSetToPosition = false;
+
   static constexpr double kCoeffDriveTrain = 1.0;
+  static constexpr double maxEncoderSpeed = 4096;
+  static constexpr const Gains kDriveGains {0.05, 0.0, 1.0, 0.0, 0, 1.0};
 
   void HandleController();
 
@@ -104,4 +120,11 @@ private:
 
   double GetAverageMotorPosition(int front, int rear);
   double GetAverageMotorVelocity(int front, int rear);
+
+  void InitializePID();
+  void InitializeMotorPID(MotorDriver *motor);
+  void SetUsePosition(bool value);
+  bool GetUsePosition();
+  void MoveUsingPosition(double x, double r);
+  void AddPositionToMotor(MotorDriver* drive, int amount);
 };

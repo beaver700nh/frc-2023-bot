@@ -32,6 +32,7 @@ public:
   bool IsShoeDown();
 
   bool IsHighGear();
+  void SetGear(bool highGear);
 
   void Periodic() override;
 

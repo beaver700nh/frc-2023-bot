@@ -42,10 +42,13 @@ void RobotContainer::ConfigureBindings() {
   m_driverControllerB.X().OnTrue(HomeArmTilt  (&m_arm).ToPtr());
   m_driverControllerB.A().OnTrue(HomeArmRotate(&m_arm).ToPtr());
   m_driverControllerB.B().OnTrue(HomeArmExtend(&m_arm).ToPtr());
+
+  //m_driverControllerA.B().OnTrue(std::move(m_arm.m_position_test).ToPtr());
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
   // An example command will be run in autonomous
   // return autos::ExampleAuto(&m_subsystem);
-  return Movement(&m_drive).GenerateCommand({0.0_m, 6.0_m, 90_deg});
+  
+  return Movement::GenerateCommand(&m_drive, {0.0_m, 6.0_m, 90_deg});
 }

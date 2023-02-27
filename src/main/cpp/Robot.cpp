@@ -10,6 +10,7 @@
 #include <frc/Timer.h>
 
 #include <iostream>
+#include <string>
 
 void Robot::RobotInit() {}
 
@@ -23,8 +24,6 @@ void Robot::RobotInit() {}
  */
 void Robot::RobotPeriodic() {
   frc2::CommandScheduler::GetInstance().Run();
-
-  frc::SmartDashboard::PutNumber("timestamp", frc::Timer::GetFPGATimestamp().to<double>());
 }
 
 /**
@@ -44,9 +43,7 @@ void Robot::AutonomousInit() {
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
   if (m_autonomousCommand) {
-    std::cerr << "HELLOOOO\n";
     m_autonomousCommand->Schedule();
-    std::cerr << "HELLOOOO\n";
   }
 }
 

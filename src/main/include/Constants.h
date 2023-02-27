@@ -34,8 +34,8 @@ namespace OperatorConstants {
   constexpr bool kArmInvertRotate = true;
   constexpr bool kArmInvertExtend = false;
 
-  constexpr bool kDriveInvertL = false;
-  constexpr bool kDriveInvertR = true;
+  constexpr bool kDriveInvertL = true;
+  constexpr bool kDriveInvertR = false;
   constexpr double kDriveRampX = 0.04;
   constexpr double kDriveRampR = 0.04;
 }
@@ -63,10 +63,10 @@ namespace DriveConstants {
 }
 
 namespace CanIds {
-  constexpr int kDriveL1 = 1;
-  constexpr int kDriveL2 = 2;
-  constexpr int kDriveR1 = 3;
-  constexpr int kDriveR2 = 4;
+  constexpr int kDriveL1 = 3;
+  constexpr int kDriveL2 = 4;
+  constexpr int kDriveR1 = 1;
+  constexpr int kDriveR2 = 2;
 
   constexpr int kArmTilt   = 6;
   constexpr int kArmRotate = 7;

@@ -41,6 +41,7 @@ void HomeArmRotate::Execute() {
 
 void HomeArmRotate::End(bool interrupted) {
   m_arm->m_rotate.Reset(-13.0);
+  m_arm->m_rotate.SetAbsolute(0);
 }
 
 bool HomeArmRotate::IsFinished() {

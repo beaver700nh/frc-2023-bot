@@ -29,3 +29,8 @@ class ExampleCommand
  private:
   ExampleSubsystem* m_subsystem;
 };
+
+class EmptyCommand : public frc2::CommandHelper<frc2::CommandBase, EmptyCommand>{
+public:
+  explicit EmptyCommand(){}
+};
