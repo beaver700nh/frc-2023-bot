@@ -28,8 +28,22 @@ bool SetArmPosition::IsFinished() {
   return true;
 }
 
-SetArmPositionWait::SetArmPositionWait(Arm *arm, ArmPosition position) : SetArmPosition(arm, position){
-  //empty
+SetArmPositionWait::SetArmPositionWait(Arm *arm, ArmPosition position)
+  : m_arm(arm), m_position(position){
+  // Register that this command requires the subsystem.
+  AddRequirements(m_arm);
+}
+
+void SetArmPositionWait::Initialize() {
+  m_position.SetArmToPosition(m_arm);
+}
+
+void SetArmPositionWait::Execute() {
+  // Empty
+}
+
+void SetArmPositionWait::End(bool interrupted) {
+  // Empty
 }
 
 bool SetArmPositionWait::IsFinished() {
@@ -64,6 +78,22 @@ bool SetArmPositionEx::IsFinished() {
   return nextPosition >= m_positions.size();
 }
 
+
+SetArmPositionExWait::SetArmPositionExWait(Arm *arm, std::vector<ArmPosition> positions)
+  :m_arm(arm), m_positions(positions) {
+  // Register that this command requires the subsystem.
+  AddRequirements(m_arm);
+}
+
+void SetArmPositionExWait::DoPosition() {
+  m_positions.at(nextPosition++).SetArmToPosition(m_arm);
+}
+
+void SetArmPositionExWait::Initialize() {
+  DoPosition();
+}
+
+
 void SetArmPositionExWait::Execute() {
   if (m_arm->InTolerance()) {
     if (nextPosition < m_positions.size()) {
@@ -71,6 +101,10 @@ void SetArmPositionExWait::Execute() {
     }
     ++nextPosition;
   }
+}
+
+void SetArmPositionExWait::End(bool interrupted) {
+  // Empty
 }
 
 bool SetArmPositionExWait::IsFinished() {

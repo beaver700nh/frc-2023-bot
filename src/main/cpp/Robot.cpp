@@ -7,12 +7,15 @@
 #include <frc2/command/CommandScheduler.h>
 
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/smartdashboard/SendableChooser.h>
 #include <frc/Timer.h>
 
 #include <iostream>
 #include <string>
 
-void Robot::RobotInit() {}
+void Robot::RobotInit() {
+  // frc::SendableChooser autoChooser {};
+}
 
 /**
  * This function is called every 20 ms, no matter the mode. Use
@@ -40,6 +43,10 @@ void Robot::DisabledPeriodic() {}
  * RobotContainer} class.
  */
 void Robot::AutonomousInit() {
+  std::cout << "auto init \n";
+
+  m_container.m_drive.ResetOdometry();
+
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
   if (m_autonomousCommand) {

@@ -1,6 +1,6 @@
 #include "Movement.h"
 
-frc2::CommandPtr Movement::GenerateCommand(Drive *drive, std::vector<frc::Translation2d> waypoints, frc::Pose2d end) {
+frc2::CommandPtr Movement::GenerateCommand(Drive *drive, frc::Pose2d start, std::vector<frc::Translation2d> waypoints, frc::Pose2d end, bool reversed) {
   frc::TrajectoryConfig config {
     DriveConstants::kMaxSpeed,
     DriveConstants::kMaxAcceleration
@@ -8,15 +8,22 @@ frc2::CommandPtr Movement::GenerateCommand(Drive *drive, std::vector<frc::Transl
 
   config.SetKinematics(kinematics);
   config.AddConstraint(voltageConstraint);
+  config.SetReversed(reversed);
 
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-    drive->GetPosition(), waypoints, end, config
+    start, waypoints, end, config
   );
+
+  frc::RamseteController ramseteController {
+    DriveConstants::kRamseteB, DriveConstants::kRamseteZeta
+  };
+
+  ramseteController.SetTolerance({0.25_m, 0.25_m, 5_deg});
 
   frc2::RamseteCommand command {
     trajectory,
     [drive] { return drive->GetPosition(); },
-    frc::RamseteController(DriveConstants::kRamseteB, DriveConstants::kRamseteZeta),
+    ramseteController,
     feedForward, kinematics,
     [drive] { return drive->GetWheelSpeeds(); },
     frc2::PIDController(DriveConstants::kDriveTrajectoryP, 0, 0),
@@ -38,6 +45,10 @@ frc2::CommandPtr Movement::GenerateCommand(Drive *drive, std::vector<frc::Transl
   );
 }
 
-frc2::CommandPtr Movement::GenerateCommand(Drive *drive, frc::Pose2d end) {
-  return GenerateCommand(drive, {}, end);
+frc2::CommandPtr Movement::GenerateCommand(Drive *drive, std::vector<frc::Translation2d> waypoints, frc::Pose2d end, bool reversed) {
+  return GenerateCommand(drive, drive->GetPosition(), {}, end, reversed);
+}
+
+frc2::CommandPtr Movement::GenerateCommand(Drive *drive, frc::Pose2d end, bool reversed) {
+  return GenerateCommand(drive, {}, end, reversed);
 }

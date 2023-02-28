@@ -47,8 +47,16 @@ void RobotContainer::ConfigureBindings() {
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  // An example command will be run in autonomous
-  // return autos::ExampleAuto(&m_subsystem);
-  
-  return Movement::GenerateCommand(&m_drive, {0.0_m, 6.0_m, 90_deg});
+  auto armDown = m_arm.m_position_pickup;
+
+  std::cout << "getting auto command \n";
+
+  auto currentMovement = Movement::GenerateCommand(&m_drive, {-0.5_m, 0.0_m, 0_deg}, true);
+
+  return currentMovement.AndThen(std::function([this, &currentMovement]{currentMovement = Movement::GenerateCommand(&m_drive, {-0.5_m, 0.0_m, 0_deg}, true);}))
+    //.AndThen(std::move(armDown).ToPtr())
+    //.AndThen([this] {m_pneu.SetClaw(true);})
+    .AndThen(Movement::GenerateCommand(&m_drive, {-0.5_m, 0.0_m, 0_deg}, {}, {4.75_m, 0.0_m, 0_deg}))
+    //.AndThen([this] {m_pneu.SetClaw(false);})
+    .AndThen(Movement::GenerateCommand(&m_drive, {4.75_m, 0.0_m, 0_deg}, {}, {0_m, 0.0_m, 0_deg}, true));
 }

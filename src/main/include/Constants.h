@@ -56,7 +56,7 @@ namespace DriveConstants {
 
   constexpr auto kMaxVoltage = 10_V;
   constexpr auto kMaxSpeed = 3_mps;
-  constexpr auto kMaxAcceleration = 1_mps_sq;
+  constexpr auto kMaxAcceleration = 2_mps_sq;
 
   constexpr auto kRamseteB = 2.0 * 1_rad * 1_rad / (1_m * 1_m);
   constexpr auto kRamseteZeta = 0.7 / 1_rad;

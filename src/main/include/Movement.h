@@ -21,8 +21,9 @@
 
 class Movement {
 public:
-  static frc2::CommandPtr GenerateCommand(Drive *drive, std::vector<frc::Translation2d> waypoints, frc::Pose2d end);
-  static frc2::CommandPtr GenerateCommand(Drive *drive, frc::Pose2d end);
+  static frc2::CommandPtr GenerateCommand(Drive *drive, frc::Pose2d start, std::vector<frc::Translation2d> waypoints, frc::Pose2d end, bool reversed = false);
+  static frc2::CommandPtr GenerateCommand(Drive *drive, std::vector<frc::Translation2d> waypoints, frc::Pose2d end, bool reversed = false);
+  static frc2::CommandPtr GenerateCommand(Drive *drive, frc::Pose2d end, bool reversed = false);
 
   inline static const frc::DifferentialDriveKinematics kinematics {
     DriveConstants::kTrackwidth

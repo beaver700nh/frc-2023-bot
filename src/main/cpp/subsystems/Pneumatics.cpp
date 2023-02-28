@@ -85,6 +85,10 @@ void Pneumatics::HandleClaw() {
   }
 }
 
+void Pneumatics::SetClaw(bool open){
+  m_slndClaw.Set(open ? SolenoidValue::kForward : SolenoidValue::kReverse);
+}
+
 void Pneumatics::HandleGear() {
   if (m_driverControllerA->GetLeftBumperPressed()) {
     m_slndGear.Set(SolenoidValue::kForward);

@@ -33,11 +33,18 @@ protected:
   ArmPosition m_position;
 };
 
-class SetArmPositionWait : public SetArmPosition {
+class SetArmPositionWait : public frc2::CommandHelper<frc2::CommandBase, SetArmPositionWait> {
 public:
   explicit SetArmPositionWait(Arm *arm, ArmPosition position);
 
+  void Initialize() override;
+  void Execute() override;
+  void End(bool interrupted) override;
   bool IsFinished() override;
+
+protected:
+  Arm *m_arm;
+  ArmPosition m_position;
 };
 
 class SetArmPositionEx : public frc2::CommandHelper<frc2::CommandBase, SetArmPositionEx>{
@@ -57,10 +64,19 @@ protected:
   unsigned int nextPosition = 0;
 };
 
-class SetArmPositionExWait : public SetArmPositionEx {
+class SetArmPositionExWait : public frc2::CommandHelper<frc2::CommandBase, SetArmPositionExWait> {
 public:
-  using SetArmPositionEx::SetArmPositionEx;
+  explicit SetArmPositionExWait(Arm *arm, std::vector<ArmPosition> position);
 
+  void DoPosition();
+
+  void Initialize() override;
   void Execute() override;
+  void End(bool interrupted) override;
   bool IsFinished() override;
+
+protected:
+  Arm *m_arm;
+  std::vector<ArmPosition> m_positions;
+  unsigned int nextPosition = 0;
 };

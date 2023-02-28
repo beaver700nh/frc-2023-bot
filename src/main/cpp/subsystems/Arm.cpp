@@ -12,7 +12,7 @@
 #include "Util.h"
 
 Arm::Arm(bool invertTilt, bool invertRotate, bool invertExtend) {
-  m_tilt  .Initialize(invertTilt,   1.0e-1, 1.0e-5, 1.0e+0, 0.0, 0.0, -0.5, 0.5);
+  m_tilt  .Initialize(invertTilt,   1.4e-1, 1.0e-5, 1.0e+0, 0.0, 0.0, -0.5, 0.5);
   m_rotate.Initialize(invertRotate, 1.0e-1, 1.0e-5, 1.0e+0, 0.0, 0.0, -0.35, 0.35);
   m_extend.Initialize(invertExtend, 1.0e-1, 1.0e-4, 1.0e+0, 0.0, 0.0, -0.5, 0.5);
 }
@@ -41,7 +41,7 @@ void Arm::Periodic() {
   const double extend = m_driverControllerB->GetRightTriggerAxis() - m_driverControllerB->GetLeftTriggerAxis();
   m_extend.Set(extend, false);
 
-  m_tilt.CheckTolerance();
+  // m_tilt.CheckTolerance();
 
   // if (m_driverControllerB->GetYButton()) {
   //   PointToZero();
@@ -62,6 +62,14 @@ void Arm::Periodic() {
 }
 
 bool Arm::InTolerance(){
+  bool tiltIn = m_tilt.InTolerance();
+  bool rotateIn = m_rotate.InTolerance();
+  bool extendIn = m_extend.InTolerance();
+
+  frc::SmartDashboard::PutBoolean("tilt", tiltIn);
+  frc::SmartDashboard::PutBoolean("rotate", rotateIn);
+  frc::SmartDashboard::PutBoolean("extend", extendIn);
+
   return m_tilt.InTolerance() && m_rotate.InTolerance() && m_extend.InTolerance();
 }
 

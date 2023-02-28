@@ -97,7 +97,7 @@ private:
   WheelOdometryInfo m_leftInfo;
   WheelOdometryInfo m_rightInfo;
 
-  static constexpr frc::Pose2d kStartPos {-56.5_in, 0_m, 90.0_deg};
+  static constexpr frc::Pose2d kStartPos {0_m, 0_m, 0_deg};
 
   frc::DifferentialDriveOdometry m_odometry {
     frc::Rotation2d(units::radian_t(m_imu.GetAngle())),

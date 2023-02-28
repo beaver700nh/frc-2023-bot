@@ -33,6 +33,7 @@ public:
 
   bool IsHighGear();
   void SetGear(bool highGear);
+  void SetClaw(bool open);
 
   void Periodic() override;
 
