@@ -53,7 +53,7 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
 
   auto currentMovement = Movement::GenerateCommand(&m_drive, {-0.5_m, 0.0_m, 0_deg}, true);
 
-  return currentMovement.AndThen(std::function([this, &currentMovement]{currentMovement = Movement::GenerateCommand(&m_drive, {-0.5_m, 0.0_m, 0_deg}, true);}))
+  return std::move(currentMovement).AndThen(std::function([this, &currentMovement]{currentMovement = Movement::GenerateCommand(&m_drive, {-0.5_m, 0.0_m, 0_deg}, true);}))
     //.AndThen(std::move(armDown).ToPtr())
     //.AndThen([this] {m_pneu.SetClaw(true);})
     .AndThen(Movement::GenerateCommand(&m_drive, {-0.5_m, 0.0_m, 0_deg}, {}, {4.75_m, 0.0_m, 0_deg}))
