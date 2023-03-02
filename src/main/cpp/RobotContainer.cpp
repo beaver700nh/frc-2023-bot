@@ -6,9 +6,13 @@
 
 #include "RobotContainer.h"
 
+#include <frc2/command/Commands.h>
 #include <frc2/command/button/Trigger.h>
+#include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/smartdashboard/SendableChooser.h>
 
 #include "commands/Autos.h"
+#include "commands/ClawControl.h"
 #include "commands/HomeArm.h"
 #include "commands/ExampleCommand.h"
 
@@ -24,6 +28,13 @@ RobotContainer::RobotContainer() {
   m_drive.AttachPneumatics(&m_pneu);
 
   m_arm  .AttachDrive(&m_drive);
+
+  autos::populate(&m_arm, &m_drive, &m_pneu);
+  for(unsigned int i = 0; i < autos::autos.size(); i++){
+    autoChooser.AddOption(autos::autos.at(i).first, i);
+  }
+
+  frc::SmartDashboard::PutData("choose auto", &autoChooser);
 
   // Configure the button bindings
   ConfigureBindings();
@@ -47,16 +58,9 @@ void RobotContainer::ConfigureBindings() {
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  auto armDown = m_arm.m_position_pickup;
-
-  std::cout << "getting auto command \n";
-
-  auto currentMovement = Movement::GenerateCommand(&m_drive, {-0.5_m, 0.0_m, 0_deg}, true);
-
-  return std::move(currentMovement).AndThen(std::function([this, &currentMovement]{currentMovement = Movement::GenerateCommand(&m_drive, {-0.5_m, 0.0_m, 0_deg}, true);}))
-    //.AndThen(std::move(armDown).ToPtr())
-    //.AndThen([this] {m_pneu.SetClaw(true);})
-    .AndThen(Movement::GenerateCommand(&m_drive, {-0.5_m, 0.0_m, 0_deg}, {}, {4.75_m, 0.0_m, 0_deg}))
-    //.AndThen([this] {m_pneu.SetClaw(false);})
-    .AndThen(Movement::GenerateCommand(&m_drive, {4.75_m, 0.0_m, 0_deg}, {}, {0_m, 0.0_m, 0_deg}, true));
+  return std::move(autos::autos.at(autoChooser.GetSelected()).second);
+  //.AndThen(std::move(armDown).ToPtr())
+  //.AndThen([this] {m_pneu.SetClaw(true);})
+  //.AndThen([this] {m_pneu.SetClaw(false);})
+  //.AndThen(Movement::GenerateCommand(&m_drive, {4.75_m, 0.0_m, 0_deg}, {}, {0_m, 0.0_m, 0_deg}, true));
 }

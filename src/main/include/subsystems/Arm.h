@@ -75,13 +75,12 @@ public:
 
   // void moveToPosition(frc2::comm);
 
-  ArmComponent m_tilt   {CanIds::kArmTilt,   PortsDIO::kArmLmswTilt,   2.5, 0.0, 160.0};
-  ArmComponent m_rotate {CanIds::kArmRotate, PortsDIO::kArmLmswRotate, 3.5, -125.0, 125.0};
+  ArmComponent m_tilt   {CanIds::kArmTilt,   PortsDIO::kArmLmswTilt,   2.5, 0.0, 160.0, 3};
+  ArmComponent m_rotate {CanIds::kArmRotate, PortsDIO::kArmLmswRotate, 3.5, -125.0, 125.0, 4, 6};
   ArmComponent m_extend {CanIds::kArmExtend, PortsDIO::kArmLmswExtend, 1.5, 0.0, 115.0};
   
   const double rotateScaleFactor = (m_rotate.maxPos - m_rotate.minPos) / (2 * M_PI);
 
-  SetArmPositionWait m_position_zero {this, ArmPosition(0.0, 0.0, 0.0)};
   SetArmPosition m_position_pickup {this, ArmPosition(150, 0, 0)};
   SetArmPositionWait m_position_loConeSide {this, {50.0, std::nullopt,  48.0}};
   SetArmPositionWait m_position_hiConeSide {this, {52.7, std::nullopt, 115.0}};

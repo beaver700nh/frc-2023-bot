@@ -7,14 +7,12 @@
 #include <frc2/command/CommandScheduler.h>
 
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/smartdashboard/SendableChooser.h>
 #include <frc/Timer.h>
 
 #include <iostream>
 #include <string>
 
-void Robot::RobotInit() {
-  // frc::SendableChooser autoChooser {};
+void Robot::RobotInit() {  
 }
 
 /**

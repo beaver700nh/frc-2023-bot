@@ -12,8 +12,12 @@
 #include "Util.h"
 
 Arm::Arm(bool invertTilt, bool invertRotate, bool invertExtend) {
-  m_tilt  .Initialize(invertTilt,   1.4e-1, 1.0e-5, 1.0e+0, 0.0, 0.0, -0.5, 0.5);
-  m_rotate.Initialize(invertRotate, 1.0e-1, 1.0e-5, 1.0e+0, 0.0, 0.0, -0.35, 0.35);
+  // frc::SmartDashboard::PutNumber("rotate p", 0);
+  // frc::SmartDashboard::PutNumber("rotate i", 0);
+  // frc::SmartDashboard::PutNumber("rotate d", 0);
+  
+  m_tilt  .Initialize(invertTilt,   3.0e-1, 1.0e-5, 1.0e+0, 0.0, 0.0, -0.5, 0.5);
+  m_rotate.Initialize(invertRotate, 5.0e-1, 0.0e-5, 0.0e+0, 0.0, 0.0, -0.35, 0.35);
   m_extend.Initialize(invertExtend, 1.0e-1, 1.0e-4, 1.0e+0, 0.0, 0.0, -0.5, 0.5);
 }
 

@@ -71,6 +71,8 @@ public:
 
   bool m_controllerControllable = true;
 
+  static constexpr frc::Pose2d kStartPos {0_m, 0_m, 0_deg};
+
 private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
@@ -86,8 +88,6 @@ private:
     {CanIds::kDriveR2},
   };
 
-  
-
   frc::MotorControllerGroup m_ctrlL {m_motors[0], m_motors[1]};
   frc::MotorControllerGroup m_ctrlR {m_motors[2], m_motors[3]};
   frc::DifferentialDrive m_drive {m_ctrlL, m_ctrlR};
@@ -96,8 +96,6 @@ private:
 
   WheelOdometryInfo m_leftInfo;
   WheelOdometryInfo m_rightInfo;
-
-  static constexpr frc::Pose2d kStartPos {0_m, 0_m, 0_deg};
 
   frc::DifferentialDriveOdometry m_odometry {
     frc::Rotation2d(units::radian_t(m_imu.GetAngle())),

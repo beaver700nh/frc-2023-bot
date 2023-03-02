@@ -6,9 +6,9 @@
 
 #include <frc2/command/CommandPtr.h>
 
-#include "Movement.h"
-
 #include "Constants.h"
+
+#include <frc/smartdashboard/SendableChooser.h>
 
 #include "subsystems/Arm.h"
 #include "subsystems/Drive.h"
@@ -54,4 +54,6 @@ public:
   Pneumatics m_pneu {};
 
   void ConfigureBindings();
+
+  frc::SendableChooser<int> autoChooser {};
 };

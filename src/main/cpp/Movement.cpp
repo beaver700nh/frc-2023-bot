@@ -1,6 +1,10 @@
+#include <iostream>
+
 #include "Movement.h"
 
 frc2::CommandPtr Movement::GenerateCommand(Drive *drive, frc::Pose2d start, std::vector<frc::Translation2d> waypoints, frc::Pose2d end, bool reversed) {
+  std::cout << "get traj\n";
+  
   frc::TrajectoryConfig config {
     DriveConstants::kMaxSpeed,
     DriveConstants::kMaxAcceleration
@@ -41,12 +45,13 @@ frc2::CommandPtr Movement::GenerateCommand(Drive *drive, frc::Pose2d start, std:
   ).AndThen(
     [drive]{
       drive->m_controllerControllable = wasControlled;
+      drive->ResetOdometry();
     }
   );
 }
 
 frc2::CommandPtr Movement::GenerateCommand(Drive *drive, std::vector<frc::Translation2d> waypoints, frc::Pose2d end, bool reversed) {
-  return GenerateCommand(drive, drive->GetPosition(), {}, end, reversed);
+  return GenerateCommand(drive, drive->kStartPos, {}, end, reversed);
 }
 
 frc2::CommandPtr Movement::GenerateCommand(Drive *drive, frc::Pose2d end, bool reversed) {
