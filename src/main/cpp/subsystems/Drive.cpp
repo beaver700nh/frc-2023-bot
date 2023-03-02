@@ -35,13 +35,7 @@ void Drive::SetPower(double x, double r, double k) {
   Util::ramp(&m_curX, x * k, m_rampX);
   Util::ramp(&m_curR, r * k, m_rampR);
 
-  if (m_driverControllerA->GetLeftBumper()){
-    m_pneumatics->SetGear(true);
-  } 
-  else{
-     m_pneumatics->SetGear(std::abs(m_curX) > 0.8);
-  }
-
+  m_pneumatics->SetGear(std::abs(m_curX) > 0.8);
   m_drive.ArcadeDrive(m_curX, m_curR);
 }
 
