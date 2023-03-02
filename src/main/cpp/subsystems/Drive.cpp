@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <cmath>
 #include <iostream>
 
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -117,8 +118,10 @@ void Drive::ResetOdometry(frc::Pose2d start, bool calibrateImu) {
 }
 
 void Drive::HandleController() {
-  const auto x = Util::thresholded(m_driverControllerA->GetLeftY() * (1 - 0.95 * m_driverControllerA->GetLeftTrigger()), -0.1, 0.1);
-  const auto r = Util::thresholded(m_driverControllerA->GetRightX() * (1 - 0.95 * m_driverControllerA->GetRightTrigger()), -0.1, 0.1);
+  double scaleFactor = 1 - (0.8 * std::max(m_driverControllerA->GetLeftTriggerAxis(), m_driverControllerB->GetRightTriggerAxis()));
+
+  const auto x = Util::thresholded(m_driverControllerA->GetLeftY() * scaleFactor, -0.1, 0.1);
+  const auto r = Util::thresholded(m_driverControllerA->GetRightX() * scaleFactor, -0.1, 0.1);
 
   // x is negative because joystick y-axis is inverted
   if(m_usePosition){
