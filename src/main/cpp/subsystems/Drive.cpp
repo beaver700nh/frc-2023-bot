@@ -31,10 +31,10 @@ void Drive::AttachPneumatics(Pneumatics *pneumatics) {
 }
 
 void Drive::SetPower(double x, double r, double k) {
-  m_pneumatics->SetGear(std::abs(x) > 0.8);
-
   Util::ramp(&m_curX, x * k, m_rampX);
   Util::ramp(&m_curR, r * k, m_rampR);
+
+  m_pneumatics->SetGear(std::abs(m_curX) > 0.8);
 
   m_drive.ArcadeDrive(m_curX, m_curR);
 }

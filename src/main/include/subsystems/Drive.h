@@ -112,6 +112,9 @@ private:
   static constexpr double maxEncoderSpeed = 4096;
   static constexpr const Gains kDriveGains {0.05, 0.0, 1.0, 0.0, 0, 1.0};
 
+  // static constexpr double maxHighSpeedSpeed = 3m_s;
+  // static constexpr double 
+
   void HandleController();
 
   units::meter_t GetEncoderTicksToMeterFactor();
