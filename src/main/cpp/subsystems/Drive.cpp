@@ -34,7 +34,12 @@ void Drive::SetPower(double x, double r, double k) {
   Util::ramp(&m_curX, x * k, m_rampX);
   Util::ramp(&m_curR, r * k, m_rampR);
 
-  m_pneumatics->SetGear(std::abs(m_curX) > 0.8);
+  if (m_driverControllerA->GetLeftBumper()){
+    m_pneumatics->SetGear(true);
+  } 
+  else{
+     m_pneumatics->SetGear(std::abs(m_curX) > 0.8);
+  }
 
   m_drive.ArcadeDrive(m_curX, m_curR);
 }
@@ -112,8 +117,8 @@ void Drive::ResetOdometry(frc::Pose2d start, bool calibrateImu) {
 }
 
 void Drive::HandleController() {
-  const auto x = Util::thresholded(m_driverControllerA->GetLeftY(), -0.1, 0.1);
-  const auto r = Util::thresholded(m_driverControllerA->GetRightX(), -0.1, 0.1);
+  const auto x = Util::thresholded(m_driverControllerA->GetLeftY() * (1 - 0.95 * m_driverControllerA->GetLeftTrigger()), -0.1, 0.1);
+  const auto r = Util::thresholded(m_driverControllerA->GetRightX() * (1 - 0.95 * m_driverControllerA->GetRightTrigger()), -0.1, 0.1);
 
   // x is negative because joystick y-axis is inverted
   if(m_usePosition){
