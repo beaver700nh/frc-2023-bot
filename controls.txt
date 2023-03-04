@@ -5,11 +5,23 @@ Drive X
 - A LeftStick Y
 Drive R
 - A RightStick X
-**TEMP**
-Reset Odometry
+//**TEMP**
+//Reset Odometry
+//- A Button A
+Force Low Gear
+- A Left Bumper
+Slow X Movement
+- A Left Trigger
+Slow R Movement
+- A Right Trigger
+Auto Drop Cone High
+- A Button Y
+Auto Drop Cone Low
+- A Button X
+Auto Drop Cube High
+- A Button B
+Auto Drop Cube Low
 - A Button A
-Gear Switch
-- A Bumpers
 
 Arm Tilt
 - B LeftStick Y
@@ -19,12 +31,8 @@ Arm Extend
 - B Triggers
 Claw Open/Close
 - B Bumpers
-Home Tilt
-- B Button X
-Home Rotate
-- B Button A
-Home Extend
-- B Button B
+Home Arm
+- B Button Y
 Rotate Forward
 - B POV Up
 Rotate Back

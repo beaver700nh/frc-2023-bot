@@ -72,6 +72,7 @@ public:
   void TurnArmToAngle(units::radian_t angle);
 
   bool InTolerance();
+  bool IsSideways();
 
   // void moveToPosition(frc2::comm);
 
@@ -81,7 +82,8 @@ public:
   
   const double rotateScaleFactor = (m_rotate.maxPos - m_rotate.minPos) / (2 * M_PI);
 
-  SetArmPosition m_position_pickup {this, ArmPosition(150, std::nullopt, 0)};
+  SetArmPosition m_position_pickup {this, {150, std::nullopt, 0}};
+  SetArmPosition m_position_pickupFront {this, {150, 0, 0}};
   SetArmPositionWait m_position_loConeSide {this, {50.0, std::nullopt,  48.0}};
   SetArmPositionWait m_position_hiConeSide {this, {52.7, std::nullopt, 115.0}};
   SetArmPositionWait m_position_loConeBack {this, {35.0, std::nullopt,  27.0}};

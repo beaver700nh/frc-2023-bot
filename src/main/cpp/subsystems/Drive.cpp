@@ -35,7 +35,7 @@ void Drive::SetPower(double x, double r, double k) {
   Util::ramp(&m_curR, r * k, m_rampR);
 
   if (m_driverControllerA->GetLeftBumper()){
-    m_pneumatics->SetGear(true);
+    m_pneumatics->SetGear(false);
   } 
   else{
      m_pneumatics->SetGear(std::abs(m_curX) > 0.8);
@@ -55,9 +55,9 @@ void Drive::Periodic() {
     HandleController();
   }
 
-  if (m_driverControllerA->GetAButtonPressed()) {
-    ResetOdometry(kStartPos, true);
-  }
+  // if (m_driverControllerA->GetAButtonPressed()) {
+  //   ResetOdometry(kStartPos, true);
+  // }
 
   if(m_driverControllerA->GetBButtonPressed()){
     SetUsePosition(!m_usePosition);

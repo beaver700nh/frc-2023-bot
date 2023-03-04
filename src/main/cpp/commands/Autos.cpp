@@ -12,7 +12,7 @@ std::vector<std::pair<std::string, frc2::CommandPtr>> autos;
 
 void populate(Arm *arm, Drive *drive, Pneumatics *pneu) {
   autos.emplace_back(
-    "2 cube",
+    "2 cube low & high",
     frc2::cmd::Sequence(
       Movement::GenerateCommand(drive, {-0.6_m, 0.0_m, 0.0_deg}, true),
       ClawControl(pneu, true),
@@ -20,6 +20,24 @@ void populate(Arm *arm, Drive *drive, Pneumatics *pneu) {
       Movement::GenerateCommand(drive, {5.0_m, 0.0_m, 0.0_deg}),
       ClawControl(pneu, false),
       frc2::WaitCommand(500_ms),
+      SetArmPosition(arm, {std::nullopt, -125.0, std::nullopt}),
+      arm->m_position_hiCubeBack,
+      Movement::GenerateCommand(drive, {-4.9_m, 0.2_m, -3.0_deg}, true),
+      ClawControl(pneu, true)
+    )
+  );
+
+  autos.emplace_back(
+    "2 cube high & mid (untested)",
+    frc2::cmd::Sequence(
+      SetArmPositionWait(arm, {std::nullopt, -125, std::nullopt}),
+      arm->m_position_hiCubeBack,
+      ClawControl(pneu, true),
+      frc2::WaitCommand(1000_ms),
+      Movement::GenerateCommand(drive, {5.0_m, 0.0_m, 0.0_deg}),
+      arm->m_position_pickupFront,
+      ClawControl(pneu, false),
+      frc2::WaitCommand(1000_ms),
       SetArmPosition(arm, {std::nullopt, -125.0, std::nullopt}),
       arm->m_position_hiCubeBack,
       Movement::GenerateCommand(drive, {-4.9_m, 0.2_m, -3.0_deg}, true),

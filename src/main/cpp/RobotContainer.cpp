@@ -45,15 +45,59 @@ void RobotContainer::ConfigureBindings() {
   // Configure your trigger bindings here
 
   // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-  frc2::Trigger([this] {
-    return m_subsystem.ExampleCondition();
-  }).OnTrue(ExampleCommand(&m_subsystem).ToPtr());
+  // frc2::Trigger([this] {
+  //   return m_subsystem.ExampleCondition();
+  // }).OnTrue(ExampleCommand(&m_subsystem).ToPtr());
+
+  m_driverControllerA.A().OnTrue(
+    frc2::cmd::Either(
+      frc2::cmd::Sequence(m_arm.m_position_loCubeSide), 
+      frc2::cmd::Sequence(m_arm.m_position_loCubeBack), 
+      [this](){
+        return m_arm.IsSideways();
+      }
+    )
+  );
+
+  m_driverControllerA.B().OnTrue(
+    frc2::cmd::Either(
+      frc2::cmd::Sequence(m_arm.m_position_hiCubeSide), 
+      frc2::cmd::Sequence(m_arm.m_position_hiCubeBack), 
+      [this](){
+        return m_arm.IsSideways();
+      }
+    )
+  );
+
+    m_driverControllerA.X().OnTrue(
+    frc2::cmd::Either(
+      frc2::cmd::Sequence(m_arm.m_position_loConeSide), 
+      frc2::cmd::Sequence(m_arm.m_position_loConeBack), 
+      [this](){
+        return m_arm.IsSideways();
+      }
+    )
+  );
+
+  m_driverControllerA.Y().OnTrue(
+    frc2::cmd::Either(
+      frc2::cmd::Sequence(m_arm.m_position_hiConeSide), 
+      frc2::cmd::Sequence(m_arm.m_position_hiConeBack), 
+      [this](){
+        return m_arm.IsSideways();
+      }
+    )
+  );
 
   // Schedule `ExampleMethodCommand` when the Xbox controller's B button is
   // pressed, cancelling on release.
-  m_driverControllerB.X().OnTrue(HomeArmTilt  (&m_arm).ToPtr());
-  m_driverControllerB.A().OnTrue(HomeArmRotate(&m_arm).ToPtr());
-  m_driverControllerB.B().OnTrue(HomeArmExtend(&m_arm).ToPtr());
+  m_driverControllerB.Y().OnTrue(
+    frc2::cmd::Sequence(
+      HomeArmExtend(&m_arm).ToPtr(),
+      HomeArmTilt(&m_arm).ToPtr(),
+      HomeArmRotate(&m_arm).ToPtr()
+    )
+  );
 
   frc2::POVButton up {&m_driverControllerB, 0};
   up.OnTrue(
@@ -89,7 +133,9 @@ void RobotContainer::ConfigureBindings() {
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  return std::move(autos::autos.at(autoChooser.GetSelected()).second);
+  return std::move(
+    autos::autos.at(autoChooser.GetSelected()).second
+  );
   //.AndThen(std::move(armDown).ToPtr())
   //.AndThen([this] {m_pneu.SetClaw(true);})
   //.AndThen([this] {m_pneu.SetClaw(false);})
