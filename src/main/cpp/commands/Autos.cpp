@@ -21,16 +21,25 @@ void populate(Arm *arm, Drive *drive, Pneumatics *pneu) {
       ClawControl(pneu, false),
       frc2::WaitCommand(500_ms),
       SetArmPosition(arm, {std::nullopt, -125.0, std::nullopt}),
-      arm->m_position_loCubeBack,
+      arm->m_position_hiCubeBack,
       Movement::GenerateCommand(drive, {-4.9_m, 0.2_m, -3.0_deg}, true),
       ClawControl(pneu, true)
     )
   );
+
   autos.emplace_back(
-    "simple cube",
+    "1 cube low",
     frc2::cmd::Sequence(
       Movement::GenerateCommand(drive, {-0.6_m, 0.0_m, 0.0_deg}, true),
       Movement::GenerateCommand(drive, {0.6_m, 0.0_m, 0.0_deg})
+    )
+  );
+
+  autos.emplace_back(
+    "1 cube high (untested)",
+    frc2::cmd::Sequence(
+      SetArmPositionWait(arm, {std::nullopt, -125, std::nullopt}),
+      arm->m_position_hiCubeBack
     )
   );
 }

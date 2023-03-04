@@ -18,7 +18,7 @@ Arm::Arm(bool invertTilt, bool invertRotate, bool invertExtend) {
   
   m_tilt  .Initialize(invertTilt,   3.0e-1, 1.0e-5, 1.0e+0, 0.0, 0.0, -0.5, 0.5);
   m_rotate.Initialize(invertRotate, 5.0e-1, 0.0e-5, 0.0e+0, 0.0, 0.0, -0.35, 0.35);
-  m_extend.Initialize(invertExtend, 1.0e-1, 1.0e-4, 1.0e+0, 0.0, 0.0, -0.5, 0.5);
+  m_extend.Initialize(invertExtend, 5.0e-1, 0.0e-4, 1.0e+0, 0.0, 0.0, -0.5, 0.5);
 }
 
 void Arm::AttachController(frc2::CommandXboxController *driverControllerA, frc2::CommandXboxController *driverControllerB) {
@@ -47,7 +47,7 @@ void Arm::Periodic() {
 
   // m_tilt.CheckTolerance();
 
-  // if (m_driverControllerB->GetYButton()) {
+  // if (m_driverControllerA->GetYButton()) {
   //   PointToZero();
   // }
   // else if (m_driverControllerB->GetYButtonReleased()) {

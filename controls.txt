@@ -25,12 +25,11 @@ Home Rotate
 - B Button A
 Home Extend
 - B Button B
-**TEMP**
-Turn To Zero
-- B Button Y
-Shoe Override Disable
-- A POV Up
-Shoe Override On
-- A POV Left
-Shoe Override Off
-- A POV Right
+Rotate Forward
+- B POV Up
+Rotate Back
+- B POV Down
+Rotate Left
+- B POV Left
+Rotate Right
+- B POV Right

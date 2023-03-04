@@ -117,12 +117,13 @@ void Drive::ResetOdometry(frc::Pose2d start, bool calibrateImu) {
 }
 
 void Drive::HandleController() {
-  const auto x = Util::thresholded(m_driverControllerA->GetLeftY() * (1 - 0.95 * m_driverControllerA->GetLeftTrigger()), -0.1, 0.1);
-  const auto r = Util::thresholded(m_driverControllerA->GetRightX() * (1 - 0.95 * m_driverControllerA->GetRightTrigger()), -0.1, 0.1);
+  const auto x = Util::thresholded(m_driverControllerA->GetLeftY() * (1 - 0.95 * m_driverControllerA->GetLeftTriggerAxis()), -0.1, 0.1);
+  const auto r = Util::thresholded(m_driverControllerA->GetRightX() * (1 - 0.95 * m_driverControllerA->GetRightTriggerAxis()), -0.1, 0.1);
 
   // x is negative because joystick y-axis is inverted
   if(m_usePosition){
     // if(x == 0 && r == 0){
+      
     //   if(!m_motorsSetToPosition){
     //     for(MotorDriver &motor : m_motors)
     //       AddPositionToMotor(&motor, 0);

@@ -10,6 +10,7 @@
 #include <frc2/command/button/Trigger.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/smartdashboard/SendableChooser.h>
+#include <frc2/command/button/POVButton.h>
 
 #include "commands/Autos.h"
 #include "commands/ClawControl.h"
@@ -54,7 +55,37 @@ void RobotContainer::ConfigureBindings() {
   m_driverControllerB.A().OnTrue(HomeArmRotate(&m_arm).ToPtr());
   m_driverControllerB.B().OnTrue(HomeArmExtend(&m_arm).ToPtr());
 
-  //m_driverControllerA.B().OnTrue(std::move(m_arm.m_position_test).ToPtr());
+  frc2::POVButton up {&m_driverControllerB, 0};
+  up.OnTrue(
+    SetArmPosition(
+      &m_arm,
+      {std::nullopt, 0, std::nullopt}
+    ).ToPtr()
+  );
+
+  frc2::POVButton left {&m_driverControllerB, 270};
+  left.OnTrue(
+    SetArmPosition(
+      &m_arm,
+      {std::nullopt, -60, std::nullopt}
+    ).ToPtr()
+  );
+
+  frc2::POVButton right {&m_driverControllerB, 90};
+  right.OnTrue(
+    SetArmPosition(
+      &m_arm,
+      {std::nullopt, 60, std::nullopt}
+    ).ToPtr()
+  );
+
+  frc2::POVButton down {&m_driverControllerB, 180};
+  down.OnTrue(
+    SetArmPosition(
+      &m_arm,
+      {std::nullopt, m_arm.m_rotate.encoder.GetPosition() < 0 ? -125 : 125, std::nullopt}
+    ).ToPtr()
+  );
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
