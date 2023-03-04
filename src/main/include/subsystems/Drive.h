@@ -128,4 +128,7 @@ private:
   bool GetUsePosition();
   void MoveUsingPosition(double x, double r);
   void AddPositionToMotor(MotorDriver* drive, int amount);
+
+  bool wasDownPressed;
+
 };

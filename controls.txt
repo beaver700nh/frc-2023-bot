@@ -22,6 +22,8 @@ Auto Drop Cube High
 - A Button B
 Auto Drop Cube Low
 - A Button A
+Drive Encoder Hold
+- A POV Down
 
 Arm Tilt
 - B LeftStick Y
@@ -33,6 +35,8 @@ Claw Open/Close
 - B Bumpers
 Home Arm
 - B Button Y
+Stop Home Arm
+- B Button B
 Rotate Forward
 - B POV Up
 Rotate Back

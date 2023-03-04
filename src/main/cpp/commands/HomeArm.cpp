@@ -22,7 +22,7 @@ void HomeArmTilt::End(bool interrupted) {
 }
 
 bool HomeArmTilt::IsFinished() {
-  return !m_arm->m_tilt.lmsw.Get();
+  return !m_arm->m_tilt.lmsw.Get();// || m_arm->m_driverControllerB->GetBButtonPressed();
 }
 
 HomeArmRotate::HomeArmRotate(Arm *arm)
@@ -32,7 +32,7 @@ HomeArmRotate::HomeArmRotate(Arm *arm)
 }
 
 void HomeArmRotate::Initialize() {
-  m_arm->m_rotate.motor.Set(-0.2);
+  m_arm->m_rotate.motor.Set(-0.3);
 }
 
 void HomeArmRotate::Execute() {
@@ -45,7 +45,7 @@ void HomeArmRotate::End(bool interrupted) {
 }
 
 bool HomeArmRotate::IsFinished() {
-  return !m_arm->m_rotate.lmsw.Get();
+  return !m_arm->m_rotate.lmsw.Get();// || m_arm->m_driverControllerB->GetBButtonPressed();
 }
 
 HomeArmExtend::HomeArmExtend(Arm *arm)
@@ -55,7 +55,7 @@ HomeArmExtend::HomeArmExtend(Arm *arm)
 }
 
 void HomeArmExtend::Initialize() {
-  m_arm->m_extend.motor.Set(-0.2);
+  m_arm->m_extend.motor.Set(-0.4);
 }
 
 void HomeArmExtend::Execute() {
@@ -67,5 +67,5 @@ void HomeArmExtend::End(bool interrupted) {
 }
 
 bool HomeArmExtend::IsFinished() {
-  return !m_arm->m_extend.lmsw.Get();
+  return !m_arm->m_extend.lmsw.Get();// || m_arm->m_driverControllerB->GetBButtonPressed();
 }

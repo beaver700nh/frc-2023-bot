@@ -54,7 +54,7 @@ void RobotContainer::ConfigureBindings() {
       frc2::cmd::Sequence(m_arm.m_position_loCubeSide), 
       frc2::cmd::Sequence(m_arm.m_position_loCubeBack), 
       [this](){
-        return m_arm.IsSideways();
+        return m_arm.IsForwards();
       }
     )
   );
@@ -64,7 +64,7 @@ void RobotContainer::ConfigureBindings() {
       frc2::cmd::Sequence(m_arm.m_position_hiCubeSide), 
       frc2::cmd::Sequence(m_arm.m_position_hiCubeBack), 
       [this](){
-        return m_arm.IsSideways();
+        return m_arm.IsForwards();
       }
     )
   );
@@ -74,7 +74,7 @@ void RobotContainer::ConfigureBindings() {
       frc2::cmd::Sequence(m_arm.m_position_loConeSide), 
       frc2::cmd::Sequence(m_arm.m_position_loConeBack), 
       [this](){
-        return m_arm.IsSideways();
+        return m_arm.IsForwards();
       }
     )
   );
@@ -84,7 +84,7 @@ void RobotContainer::ConfigureBindings() {
       frc2::cmd::Sequence(m_arm.m_position_hiConeSide), 
       frc2::cmd::Sequence(m_arm.m_position_hiConeBack), 
       [this](){
-        return m_arm.IsSideways();
+        return m_arm.IsForwards();
       }
     )
   );
@@ -92,10 +92,14 @@ void RobotContainer::ConfigureBindings() {
   // Schedule `ExampleMethodCommand` when the Xbox controller's B button is
   // pressed, cancelling on release.
   m_driverControllerB.Y().OnTrue(
-    frc2::cmd::Sequence(
-      HomeArmExtend(&m_arm).ToPtr(),
-      HomeArmTilt(&m_arm).ToPtr(),
-      HomeArmRotate(&m_arm).ToPtr()
+    frc2::cmd::Parallel(
+      frc2::cmd::Sequence(
+        HomeArmExtend(&m_arm).ToPtr(),
+        HomeArmTilt(&m_arm).ToPtr()
+      ),
+      frc2::cmd::Sequence(
+        HomeArmRotate(&m_arm).ToPtr()
+      )
     )
   );
 

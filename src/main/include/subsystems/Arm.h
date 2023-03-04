@@ -72,7 +72,7 @@ public:
   void TurnArmToAngle(units::radian_t angle);
 
   bool InTolerance();
-  bool IsSideways();
+  bool IsForwards();
 
   // void moveToPosition(frc2::comm);
 
@@ -106,8 +106,7 @@ public:
       ArmPosition(50,0,std::nullopt)
     }
   }; 
-
-private:
+  
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
   frc2::CommandXboxController *m_driverControllerA = nullptr;

@@ -77,10 +77,10 @@ bool Arm::InTolerance(){
   return m_tilt.InTolerance() && m_rotate.InTolerance() && m_extend.InTolerance();
 }
 
-bool Arm::IsSideways(){
-  double pos = std::abs(m_rotate.encoder.GetPosition());
+bool Arm::IsForwards(){
+  double pos = m_rotate.encoder.GetPosition();
 
-  return 30 < pos && pos < 90;
+  return -90 < pos && pos < 90;
 }
 
 void Arm::AutoShoe(std::optional<ArmComponent::MoveInfo> info) {
