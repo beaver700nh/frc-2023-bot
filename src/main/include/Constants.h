@@ -36,8 +36,8 @@ namespace OperatorConstants {
 
   constexpr bool kDriveInvertL = true;
   constexpr bool kDriveInvertR = false;
-  constexpr double kDriveRampX = 0.02;
-  constexpr double kDriveRampR = 0.02;
+  constexpr double kDriveRampX = 0.04;
+  constexpr double kDriveRampR = 0.04;
 }
 
 namespace DriveConstants {

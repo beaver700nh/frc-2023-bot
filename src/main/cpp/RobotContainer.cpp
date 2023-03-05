@@ -92,15 +92,15 @@ void RobotContainer::ConfigureBindings() {
   // Schedule `ExampleMethodCommand` when the Xbox controller's B button is
   // pressed, cancelling on release.
   m_driverControllerB.Y().OnTrue(
-    frc2::cmd::Parallel(
+    // frc2::cmd::Parallel(
       frc2::cmd::Sequence(
         HomeArmExtend(&m_arm).ToPtr(),
-        HomeArmTilt(&m_arm).ToPtr()
-      ),
-      frc2::cmd::Sequence(
+        HomeArmTilt(&m_arm).ToPtr(),
+      // ),
+      // frc2::cmd::Sequence(
         HomeArmRotate(&m_arm).ToPtr()
       )
-    )
+    // )
   );
 
   frc2::POVButton up {&m_driverControllerB, 0};
