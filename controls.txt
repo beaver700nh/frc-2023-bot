@@ -24,6 +24,18 @@ Auto Drop Cube Low
 - A Button A
 Drive Encoder Hold
 - A POV Down
+**TEMP**
+Intake Wheel Forward
+ - A POV 90
+**TEMP**
+Intake Wheel Backward
+ - A POV 270
+**TEMP**
+Intake Rotate Up
+ - A POV 0
+**TEMP**
+Intake Rotate Down
+ - A POV 180
 
 Arm Tilt
 - B LeftStick Y
@@ -35,8 +47,14 @@ Claw Open/Close
 - B Bumpers
 Home Arm
 - B Button Y
-Stop Home Arm
+Home Tilt
+- B Button X
+Stop Arm
 - B Button B
+Lock Tilt
+- B Button A
+Unlock Tilt
+- B Button Start
 Rotate Forward
 - B POV Up
 Rotate Back

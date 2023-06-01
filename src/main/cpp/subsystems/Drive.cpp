@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <cmath>
 #include <iostream>
 
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -42,13 +43,24 @@ void Drive::SetPower(double x, double r, double k) {
   Util::ramp(&m_curR, r * k, m_rampR);
 
   if (m_driverControllerA->GetLeftBumper()){
-      m_pneumatics->SetGear(false);
-  } 
+    m_pneumatics->SetGear(false);
+  }
   else{
-     m_pneumatics->SetGear(std::abs(m_curX) > 0.8);
+    AutoShift();
   }
 
   m_drive.ArcadeDrive(m_curX, m_curR);
+}
+
+void Drive::AutoShift(){
+  double avgSpeed = (std::abs(m_leftInfo.velocity.to<double>()) + std::abs(m_rightInfo.velocity.to<double>())) / 2;
+  if(avgSpeed > maxLowGearSpeed.to<double>() && !m_pneumatics->IsHighSpeed()){
+    std::cout << "high speed\n";
+    m_pneumatics->SetGear(true);
+  } else if (avgSpeed < minHighGearSpeed.to<double>() && m_pneumatics->IsHighSpeed()){
+    std::cout << "low speed\n";
+    m_pneumatics->SetGear(false);
+  }
 }
 
 void Drive::SetVolts(units::volt_t left, units::volt_t right) {
@@ -92,7 +104,11 @@ void Drive::Periodic() {
   frc::SmartDashboard::PutNumber("Pos. Y", m_odometry.GetPose().Translation().Y().to<double>());
   frc::SmartDashboard::PutNumber("Pos. A", m_odometry.GetPose().Rotation().Degrees().to<double>());
 
+  frc::SmartDashboard::PutNumber("Drive Power X", m_curX);
+
   frc::SmartDashboard::PutBoolean("Balance Mode", m_usePosition);
+
+  frc::SmartDashboard::PutNumber("IMU Pitch", GetPitch().to<double>());
 }
 
 void Drive::Calculate() {
@@ -129,8 +145,11 @@ void Drive::ResetOdometry(frc::Pose2d start, bool calibrateImu) {
 }
 
 void Drive::HandleController() {
-  const auto x = Util::thresholded(m_driverControllerA->GetLeftY() * (1 - 0.95 * m_driverControllerA->GetLeftTriggerAxis()), -0.1, 0.1);
-  const auto r = Util::thresholded(m_driverControllerA->GetRightX() * (1 - 0.95 * m_driverControllerA->GetRightTriggerAxis()), -0.1, 0.1);
+  double scaleFactor = 1 - (0.65 * m_driverControllerA->GetLeftTriggerAxis());
+  double rotatationScaleFactor = 1 - (.4 * m_driverControllerA->GetRightTriggerAxis());
+
+  const auto x = Util::thresholded(m_driverControllerA->GetLeftY(), -0.1, 0.1)* scaleFactor;
+  const auto r = Util::thresholded(m_driverControllerA->GetRightX(), -0.1, 0.1) * scaleFactor * rotatationScaleFactor;
 
   // x is negative because joystick y-axis is inverted
   if(m_usePosition){
@@ -158,7 +177,7 @@ void Drive::HandleController() {
 units::meter_t Drive::GetEncoderTicksToMeterFactor(){
   return (
     DriveConstants::kDriveBaseEncoderDistancePerPulse /
-    (m_pneumatics->IsHighGear() ? DriveConstants::kDriveHighGearRatio : DriveConstants::kDriveLowGearRatio)
+    (m_pneumatics->IsHighSpeed() ? DriveConstants::kDriveLowGearRatio : DriveConstants::kDriveHighGearRatio)
   );
 }
 
@@ -225,7 +244,7 @@ bool Drive::GetUsePosition(){
 }
 
 void Drive::AddPositionToMotor(MotorDriver* motor, int amount){
-  std::cout << "add to motor, amount: " << amount << ", curr pos: " << motor->GetSelectedSensorPosition() << " \n";
+  // std::cout << "add to motor, amount: " << amount << ", curr pos: " << motor->GetSelectedSensorPosition() << " \n";
   motor -> Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, motor->GetSelectedSensorPosition() + amount);
 }
 
@@ -241,6 +260,10 @@ void Drive::MoveUsingPosition(double x, double r){
   AddPositionToMotor(m_motors + 1, x + r);
   AddPositionToMotor(m_motors + 2, x - r);
   AddPositionToMotor(m_motors + 3, x - r);
+}
+
+units::degree_t Drive::GetPitch(){
+  return -Util::scaleAngle(m_imu.GetYFilteredAccelAngle()) + 4.17_deg; //TODO make better
 }
 
 void WheelOdometryInfo::Calculate(double curPosition, double curVelocity, units::meter_t tickToMeterFactor) {

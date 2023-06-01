@@ -31,9 +31,12 @@ public:
   void Unshoe();
   bool IsShoeDown();
 
-  bool IsHighGear();
+  bool IsHighSpeed();
   void SetGear(bool highGear);
   void SetClaw(bool open);
+  void SetIntake(bool forward);
+  bool IsIntakeForward();
+  void SetLockTilt(bool lock);
 
   void Periodic() override;
 
@@ -56,6 +59,16 @@ private:
   frc::DoubleSolenoid m_slndGear {
     CanIds::kPneuCtrlHub, PneuType::REVPH,
     PortsPCH::kPneuSlndGear1, PortsPCH::kPneuSlndGear2,
+  };
+
+  frc::DoubleSolenoid m_slndIntake {
+    CanIds::kPneuCtrlHub, PneuType::REVPH,
+    PortsPCH::kPneuSlndIntake1, PortsPCH::kPneuSlndIntake2,
+  };
+
+  frc::DoubleSolenoid m_slndLockTilt {
+    CanIds::kPneuCtrlHub, PneuType::REVPH,
+    PortsPCH::kPneuSlndTiltLock1, PortsPCH::kPneuSlndTiltLock2
   };
 
   SolenoidValue m_shoeOverride = SolenoidValue::kOff;

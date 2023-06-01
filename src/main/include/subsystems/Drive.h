@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include <units/length.h>
+#include <units/velocity.h>
 
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
@@ -58,6 +59,9 @@ public:
 
   void SetPower(double x, double r, double k = 1.0);
   void SetVolts(units::volt_t left, units::volt_t right);
+  void MoveUsingPosition(double x, double r);
+
+  void AutoShift();
 
   void Periodic() override;
 
@@ -68,6 +72,8 @@ public:
   frc::DifferentialDriveWheelSpeeds GetWheelSpeeds();
 
   void ResetOdometry(frc::Pose2d start = kStartPos, bool calibrateImu = false);
+
+  units::degree_t GetPitch();
 
   bool m_controllerControllable = true;
 
@@ -109,11 +115,11 @@ private:
   bool m_motorsSetToPosition = false;
 
   static constexpr double kCoeffDriveTrain = 1.0;
-  static constexpr double maxEncoderSpeed = 4096;
+  static constexpr double maxEncoderSpeed = 8192;
   static constexpr const Gains kDriveGains {0.05, 0.0, 1.0, 0.0, 0, 1.0};
 
-  // static constexpr double maxHighSpeedSpeed = 3m_s;
-  // static constexpr double 
+  static constexpr units::velocity::meters_per_second_t minHighGearSpeed = 1.7_mps;
+  static constexpr units::velocity::meters_per_second_t maxLowGearSpeed = 2_mps;
 
   void HandleController();
 
@@ -126,9 +132,7 @@ private:
   void InitializeMotorPID(MotorDriver *motor);
   void SetUsePosition(bool value);
   bool GetUsePosition();
-  void MoveUsingPosition(double x, double r);
   void AddPositionToMotor(MotorDriver* drive, int amount);
 
   bool wasDownPressed;
-
 };

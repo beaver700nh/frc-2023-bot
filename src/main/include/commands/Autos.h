@@ -7,6 +7,10 @@
 #include <vector>
 #include <utility>
 
+#include <units/length.h>
+#include <units/velocity.h>
+#include <units/angle.h>
+
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/WaitCommand.h>
 

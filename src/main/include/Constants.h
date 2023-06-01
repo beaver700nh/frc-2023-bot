@@ -27,17 +27,21 @@
  */
 
 namespace OperatorConstants {
-  constexpr int kDriverControllerAPort = 0;
-  constexpr int kDriverControllerBPort = 1;
+  constexpr int kDriverControllerAPort = 1;
+  constexpr int kDriverControllerBPort = 0;
 
   constexpr bool kArmInvertTilt   = true;
   constexpr bool kArmInvertRotate = true;
   constexpr bool kArmInvertExtend = false;
 
+  constexpr bool kIntakeInvertRotate      = true;
+  constexpr bool kIntakeInvertLeftWheel   = true;
+  constexpr bool kIntakeInvertRightWheel  = true;
+
   constexpr bool kDriveInvertL = true;
   constexpr bool kDriveInvertR = false;
-  constexpr double kDriveRampX = 0.02;
-  constexpr double kDriveRampR = 0.02;
+  constexpr double kDriveRampX = 0.04;
+  constexpr double kDriveRampR = 0.04;
 }
 
 namespace DriveConstants {
@@ -72,13 +76,18 @@ namespace CanIds {
   constexpr int kArmRotate = 7;
   constexpr int kArmExtend = 8;
 
+  constexpr int kIntakeRotate = 12;
+  constexpr int kIntakeLeftWheel = 13;
+  constexpr int kIntakeRightWheel = 14
+  ;
+
   constexpr int kPneuCtrlHub = 11;
 }
 
 namespace PortsDIO {
   constexpr int kArmLmswTilt   = 0;
   constexpr int kArmLmswRotate = 1;
-  constexpr int kArmLmswExtend = 9;
+  constexpr int kArmLmswExtend = 8;
 }
 
 namespace PortsPCH {
@@ -88,4 +97,8 @@ namespace PortsPCH {
   constexpr int kPneuSlndClaw2 = 11;
   constexpr int kPneuSlndGear1 = 7;
   constexpr int kPneuSlndGear2 = 15;
+  constexpr int kPneuSlndIntake1 = 1;
+  constexpr int kPneuSlndIntake2 = 9;
+  constexpr int kPneuSlndTiltLock1 = 4;
+  constexpr int kPneuSlndTiltLock2 = 12;
 }

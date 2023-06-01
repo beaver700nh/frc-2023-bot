@@ -5,10 +5,12 @@
 #pragma once
 
 #include <functional>
+#include <string>
 
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
 #include <frc2/command/button/CommandXboxController.h>
+
 
 #include <frc/DigitalInput.h>
 
@@ -30,7 +32,7 @@ using SparkMaxCtrlType = rev::CANSparkMax::ControlType;
 
 struct ArmComponent {
 public:
-  ArmComponent(int motorCanId, int lmswPort, double coeff, double minPos, double maxPos, double tolerance = 2, int timesInTolReq = 3);
+  ArmComponent(bool unlock, int motorCanId, int lmswPort, double coeff, double minPos, double maxPos, double tolerance = 2, int timesInTolReq = 3);
 
   struct MoveInfo {
     double position, adjusted, constrained;
@@ -42,6 +44,10 @@ public:
   void Reset(double pos = 0.0);
   void CheckTolerance();
   bool InTolerance();
+  void AttachPneumatics(Pneumatics *pneu);
+
+  Pneumatics *pneu = nullptr;
+  bool unlock;
 
   MotorArm motor;
   rev::SparkMaxRelativeEncoder encoder;
@@ -50,9 +56,27 @@ public:
   double targetPosition;
   int timesInTol;
 
-  const double coeff, minPos, maxPos, tolerance;
+  const double coeff, minPos, maxPos;
+
+  const double tolerance;
   const int timesInTolReq;
 };
+
+// struct VisionCubePipeline {
+//   VisionCubePipeline(std::string cameraName);
+
+//   bool IsCubeFound();
+//   double GetCubeX();
+//   double GetCubeY();
+//   double GetCubeW();
+//   double GetCubeH();
+
+//   void SetPipelineEnabled(bool enabled);
+//   bool IsPilelineEnabled();
+
+//   private:
+//     const std::string m_cameraName;
+// };
 
 class Arm : public frc2::SubsystemBase {
 public:
@@ -74,16 +98,16 @@ public:
   bool InTolerance();
   bool IsForwards();
 
-  // void moveToPosition(frc2::comm);
-
-  ArmComponent m_tilt   {CanIds::kArmTilt,   PortsDIO::kArmLmswTilt,   2.5, 0.0, 160.0, 3};
-  ArmComponent m_rotate {CanIds::kArmRotate, PortsDIO::kArmLmswRotate, 3.5, -125.0, 125.0, 4, 6};
-  ArmComponent m_extend {CanIds::kArmExtend, PortsDIO::kArmLmswExtend, 1.5, 0.0, 115.0};
+  ArmComponent m_tilt   {true, CanIds::kArmTilt,   PortsDIO::kArmLmswTilt,   2.5, 0.0, 160.0, 3};
+  ArmComponent m_rotate {false, CanIds::kArmRotate, PortsDIO::kArmLmswRotate, 3.5, -135.0, 135.0, 4, 6};
+  ArmComponent m_extend {false, CanIds::kArmExtend, PortsDIO::kArmLmswExtend, 1.5, 0.0, 118.0};
   
   const double rotateScaleFactor = (m_rotate.maxPos - m_rotate.minPos) / (2 * M_PI);
 
+  SetArmPositionWait m_position_up {this, {0, std::nullopt, 0}};
   SetArmPosition m_position_pickup {this, {150, std::nullopt, 0}};
   SetArmPosition m_position_pickupFront {this, {150, 0, 0}};
+  SetArmPositionWait m_position_pickupFront_wait {this, {150, 0, 0}};
   SetArmPositionWait m_position_loConeSide {this, {50.0, std::nullopt,  48.0}};
   SetArmPositionWait m_position_hiConeSide {this, {52.7, std::nullopt, 115.0}};
   SetArmPositionWait m_position_loConeBack {this, {35.0, std::nullopt,  27.0}};
@@ -92,6 +116,7 @@ public:
   SetArmPositionWait m_position_hiCubeSide {this, {67.5, std::nullopt,  95.8}};
   SetArmPositionWait m_position_loCubeBack {this, {55.0, std::nullopt,   6.4}};
   SetArmPositionWait m_position_hiCubeBack {this, {65.0, std::nullopt,  85.0}};
+  SetArmPositionWait m_position_hiCubeFront{this, {65, std::nullopt,  114}};
   SetArmPositionExWait m_position_slideShelf {
     this, 
     {
