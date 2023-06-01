@@ -38,9 +38,9 @@ bool Pneumatics::IsShoeDown() {
   return m_slndShoe.Get() == SolenoidValue::kForward;
 }
 
-// High gear is the slow speed (based on gear ratio)
-bool Pneumatics::IsHighGear() {
-  return m_slndGear.Get() == SolenoidValue::kForward;
+// High gear is the fast speed
+bool Pneumatics::IsHighSpeed() {
+  return m_slndGear.Get() == SolenoidValue::kReverse;
 }
 
 void Pneumatics::SetGear(bool highGear){
@@ -97,6 +97,25 @@ void Pneumatics::HandleGear() {
   else if (m_driverControllerA->GetRightBumperPressed()) {
     m_slndGear.Set(SolenoidValue::kReverse);
     frc::SmartDashboard::PutString("Pneu. Gear", "fast");
+  }
+}
+
+void Pneumatics::SetIntake(bool forward){
+  m_slndIntake.Set(forward ? SolenoidValue::kForward : SolenoidValue::kReverse);
+}
+
+bool Pneumatics::IsIntakeForward(){
+  return m_slndIntake.Get() == SolenoidValue::kForward;
+}
+
+void Pneumatics::SetLockTilt(bool lock){
+  if (lock) {
+    m_slndLockTilt.Set(SolenoidValue::kForward);
+    frc::SmartDashboard::PutString("Pneu. Lock", "locked");
+  }
+  else {
+    m_slndLockTilt.Set(SolenoidValue::kReverse);
+    frc::SmartDashboard::PutString("Pneu. Lock", "unlocked");
   }
 }
 

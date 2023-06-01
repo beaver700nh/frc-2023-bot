@@ -13,6 +13,7 @@
 #include "subsystems/Arm.h"
 #include "subsystems/Drive.h"
 #include "subsystems/Pneumatics.h"
+#include "subsystems/Intake.h"
 #include "subsystems/ExampleSubsystem.h"
 
 #include "commands/Autos.h"
@@ -51,10 +52,15 @@ public:
     OperatorConstants::kDriveRampR,
   };
 
+  Intake m_intake {
+    OperatorConstants::kIntakeInvertRotate,
+    OperatorConstants::kIntakeInvertLeftWheel,
+    OperatorConstants::kIntakeInvertRightWheel
+  };
+
   Pneumatics m_pneu {};
 
   void ConfigureBindings();
 
   frc::SendableChooser<int> autoChooser {};
-
 };

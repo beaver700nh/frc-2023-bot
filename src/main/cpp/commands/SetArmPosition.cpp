@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <iostream>
+
 #include "commands/SetArmPosition.h"
 
 #include "subsystems/Arm.h"
@@ -111,6 +113,28 @@ bool SetArmPositionExWait::IsFinished() {
   return nextPosition > m_positions.size();
 }
 
+SetArmPositionCurrent::SetArmPositionCurrent(Arm *arm) : m_arm(arm){
+  AddRequirements(m_arm);
+}
+
+void SetArmPositionCurrent::Initialize(){
+  m_arm->m_tilt.SetAbsolute(m_arm->m_tilt.encoder.GetPosition());
+  m_arm->m_rotate.SetAbsolute(m_arm->m_rotate.encoder.GetPosition());
+  m_arm->m_extend.SetAbsolute(m_arm->m_extend.encoder.GetPosition());
+}
+
+void SetArmPositionCurrent::Execute(){
+  // empty
+}
+
+void SetArmPositionCurrent::End(bool interrupted){
+  //empty
+}
+
+bool SetArmPositionCurrent::IsFinished(){
+  return true;
+}
+
 ArmPosition::ArmPosition(std::optional<double> tilt, std::optional<double> rotate, std::optional<double> extend)
   : tilt(tilt), rotate(rotate), extend(extend) {
   // Empty
@@ -129,3 +153,4 @@ void ArmPosition::SetArmToPosition(Arm *arm){
     arm->m_extend.SetAbsolute(extend.value());
   }
 }
+

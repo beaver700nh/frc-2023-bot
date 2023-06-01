@@ -11,6 +11,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/smartdashboard/Field2d.h>
 
+#include <units/velocity.h>
 
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/RamseteCommand.h>
@@ -21,9 +22,9 @@
 
 class Movement {
 public:
-  static frc2::CommandPtr GenerateCommand(Drive *drive, frc::Pose2d start, std::vector<frc::Translation2d> waypoints, frc::Pose2d end, bool reversed = false);
-  static frc2::CommandPtr GenerateCommand(Drive *drive, std::vector<frc::Translation2d> waypoints, frc::Pose2d end, bool reversed = false);
-  static frc2::CommandPtr GenerateCommand(Drive *drive, frc::Pose2d end, bool reversed = false);
+  static frc2::CommandPtr GenerateCommand(Drive *drive, frc::Pose2d start, std::vector<frc::Translation2d> waypoints, frc::Pose2d end, bool reversed = false, units::meters_per_second_t maxSpeed = DriveConstants::kMaxSpeed);
+  static frc2::CommandPtr GenerateCommand(Drive *drive, std::vector<frc::Translation2d> waypoints, frc::Pose2d end, bool reversed = false, units::meters_per_second_t maxSpeed = DriveConstants::kMaxSpeed);
+  static frc2::CommandPtr GenerateCommand(Drive *drive, frc::Pose2d end, bool reversed = false, units::meters_per_second_t maxSpeed = DriveConstants::kMaxSpeed);
 
   inline static const frc::DifferentialDriveKinematics kinematics {
     DriveConstants::kTrackwidth

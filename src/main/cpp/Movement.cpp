@@ -2,11 +2,12 @@
 
 #include "Movement.h"
 
-frc2::CommandPtr Movement::GenerateCommand(Drive *drive, frc::Pose2d start, std::vector<frc::Translation2d> waypoints, frc::Pose2d end, bool reversed) {
+
+frc2::CommandPtr Movement::GenerateCommand(Drive *drive, frc::Pose2d start, std::vector<frc::Translation2d> waypoints, frc::Pose2d end, bool reversed, units::meters_per_second_t maxSpeed) {
   std::cout << "get traj\n";
   
   frc::TrajectoryConfig config {
-    DriveConstants::kMaxSpeed,
+    maxSpeed,
     DriveConstants::kMaxAcceleration
   };
 
@@ -50,10 +51,10 @@ frc2::CommandPtr Movement::GenerateCommand(Drive *drive, frc::Pose2d start, std:
   );
 }
 
-frc2::CommandPtr Movement::GenerateCommand(Drive *drive, std::vector<frc::Translation2d> waypoints, frc::Pose2d end, bool reversed) {
-  return GenerateCommand(drive, drive->kStartPos, {}, end, reversed);
+frc2::CommandPtr Movement::GenerateCommand(Drive *drive, std::vector<frc::Translation2d> waypoints, frc::Pose2d end, bool reversed, units::meters_per_second_t maxSpeed) {
+  return GenerateCommand(drive, drive->kStartPos, {}, end, reversed, maxSpeed);
 }
 
-frc2::CommandPtr Movement::GenerateCommand(Drive *drive, frc::Pose2d end, bool reversed) {
-  return GenerateCommand(drive, {}, end, reversed);
+frc2::CommandPtr Movement::GenerateCommand(Drive *drive, frc::Pose2d end, bool reversed, units::meters_per_second_t maxSpeed) {
+  return GenerateCommand(drive, {}, end, reversed, maxSpeed);
 }

@@ -6,11 +6,13 @@
 
 #include "RobotContainer.h"
 
-#include <frc2/command/Commands.h>
-#include <frc2/command/button/Trigger.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/smartdashboard/SendableChooser.h>
+
+#include <frc2/command/Commands.h>
+#include <frc2/command/button/Trigger.h>
 #include <frc2/command/button/POVButton.h>
+
 
 #include "commands/Autos.h"
 #include "commands/ClawControl.h"
@@ -24,11 +26,16 @@ RobotContainer::RobotContainer() {
   m_arm  .AttachController(&m_driverControllerA, &m_driverControllerB);
   m_drive.AttachController(&m_driverControllerA, &m_driverControllerB);
   m_pneu .AttachController(&m_driverControllerA, &m_driverControllerB);
+  m_intake .AttachController(&m_driverControllerA, &m_driverControllerB);
+  
 
   m_arm  .AttachPneumatics(&m_pneu);
   m_drive.AttachPneumatics(&m_pneu);
+  m_intake.AttachPneumatics(&m_pneu);
 
   m_arm  .AttachDrive(&m_drive);
+
+  m_pneu.SetLockTilt(false);
 
   autos::populate(&m_arm, &m_drive, &m_pneu);
   for(unsigned int i = 0; i < autos::autos.size(); i++){
@@ -102,37 +109,63 @@ void RobotContainer::ConfigureBindings() {
       )
     // )
   );
-
-  frc2::POVButton up {&m_driverControllerB, 0};
-  up.OnTrue(
-    SetArmPosition(
-      &m_arm,
-      {std::nullopt, 0, std::nullopt}
-    ).ToPtr()
+  m_driverControllerB.X().OnTrue(
+    HomeArmTilt(&m_arm).ToPtr()
   );
 
-  frc2::POVButton left {&m_driverControllerB, 270};
-  left.OnTrue(
-    SetArmPosition(
-      &m_arm,
-      {std::nullopt, -60, std::nullopt}
-    ).ToPtr()
+  m_driverControllerB.B().OnTrue(
+    SetArmPositionCurrent(&m_arm).ToPtr()
   );
 
-  frc2::POVButton right {&m_driverControllerB, 90};
-  right.OnTrue(
-    SetArmPosition(
-      &m_arm,
-      {std::nullopt, 60, std::nullopt}
-    ).ToPtr()
+  m_driverControllerB.A().OnTrue(
+    frc2::cmd::Sequence(
+      HomeArmTilt(&m_arm),
+      frc2::cmd::RunOnce(
+        [this]{
+          m_pneu.SetLockTilt(true);
+        }
+      )
+    )
   );
 
-  frc2::POVButton down {&m_driverControllerB, 180};
-  down.OnTrue(
-    SetArmPosition(
-      &m_arm,
-      {std::nullopt, m_arm.m_rotate.encoder.GetPosition() < 0 ? -125 : 125, std::nullopt}
-    ).ToPtr()
+  m_driverControllerB.Start().OnTrue(
+    frc2::cmd::RunOnce(
+      [this]{
+        m_pneu.SetLockTilt(false);
+      }
+    )
+  );
+
+  frc2::POVButton {&m_driverControllerB, 0}.OnTrue(
+    frc2::cmd::Sequence(
+      SetArmPositionWait(&m_arm, {0, std::nullopt, 0}),
+      SetArmPosition(&m_arm, {std::nullopt, 0, std::nullopt})
+    )
+  );
+
+  frc2::POVButton {&m_driverControllerB, 270}.OnTrue(
+    frc2::cmd::Sequence(
+      SetArmPositionWait(&m_arm, {0, std::nullopt, 0}),
+      SetArmPosition(&m_arm, {std::nullopt, -60, std::nullopt})
+    )
+  );
+
+  frc2::POVButton {&m_driverControllerB, 90}.OnTrue(
+    frc2::cmd::Sequence(
+      SetArmPositionWait(&m_arm, {0, std::nullopt, 0}),
+      SetArmPosition(&m_arm, {std::nullopt, 60, std::nullopt})
+    )
+  );
+
+  frc2::POVButton {&m_driverControllerB, 180}.OnTrue(
+    frc2::cmd::Sequence(
+      SetArmPositionWait(&m_arm, {0, std::nullopt, 0}),
+      frc2::cmd::Either(
+        SetArmPosition(&m_arm, {std::nullopt,  125, std::nullopt}).ToPtr(),
+        SetArmPosition(&m_arm, {std::nullopt, -125, std::nullopt}).ToPtr(),
+        [this]() {return m_arm.m_rotate.encoder.GetPosition() >= 0;}
+      )
+    )
   );
 }
 

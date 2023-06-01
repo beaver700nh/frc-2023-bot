@@ -80,3 +80,16 @@ protected:
   std::vector<ArmPosition> m_positions;
   unsigned int nextPosition = 0;
 };
+
+class SetArmPositionCurrent : public frc2::CommandHelper<frc2::CommandBase, SetArmPositionCurrent> {
+public:
+  explicit SetArmPositionCurrent(Arm *arm);
+
+  void Initialize() override;
+  void Execute() override;
+  void End(bool interrupted) override;
+  bool IsFinished() override;
+
+protected:
+  Arm *m_arm;
+};

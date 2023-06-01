@@ -17,8 +17,8 @@ Arm::Arm(bool invertTilt, bool invertRotate, bool invertExtend) {
   // frc::SmartDashboard::PutNumber("rotate d", 0);
   
   m_tilt  .Initialize(invertTilt,   3.0e-1, 1.0e-5, 1.0e+0, 0.0, 0.0, -0.5, 0.5);
-  m_rotate.Initialize(invertRotate, 5.0e-1, 0.0e-5, 0.0e+0, 0.0, 0.0, -0.35, 0.35);
-  m_extend.Initialize(invertExtend, 5.0e-1, 0.0e-4, 1.0e+0, 0.0, 0.0, -0.5, 0.5);
+  m_rotate.Initialize(invertRotate, 5.0e-1, 0.0e-5, 0.0e+0, 0.0, 0.0, -0.5, 0.5);
+  m_extend.Initialize(invertExtend, 5.0e-1, 0.0e-4, 1.0e+0, 0.0, 0.0, -0.7, 0.7);
 }
 
 void Arm::AttachController(frc2::CommandXboxController *driverControllerA, frc2::CommandXboxController *driverControllerB) {
@@ -28,6 +28,7 @@ void Arm::AttachController(frc2::CommandXboxController *driverControllerA, frc2:
 
 void Arm::AttachPneumatics(Pneumatics *pneumatics) {
   m_pneumatics = pneumatics;
+  m_tilt.AttachPneumatics(pneumatics);
 }
 
 void Arm::AttachDrive(Drive *drive) {
@@ -88,7 +89,7 @@ void Arm::AutoShoe(std::optional<ArmComponent::MoveInfo> info) {
     return;
   }
 
-  if (std::abs(info.value().position - info.value().constrained) >= 2.2) {
+  if (std::abs(info.value().position - info.value().constrained) >= 1.8) {
     m_pneumatics->Unshoe();
   }
   else {
@@ -123,8 +124,8 @@ void Arm::TurnArmToAngle(units::radian_t angle) {
   m_rotate.SetAbsolute(GetEncoderForAngle(angle));
 }
 
-ArmComponent::ArmComponent(int motorCanId, int lmswPort, double coeff, double minPos, double maxPos, double tolerance, int timesInTolReq) :
-  motor(motorCanId, MotorArmType::kBrushless), encoder(motor.GetEncoder()), pidCtrl(motor.GetPIDController()),
+ArmComponent::ArmComponent(bool unlock, int motorCanId, int lmswPort, double coeff, double minPos, double maxPos, double tolerance, int timesInTolReq) :
+  unlock(unlock), motor(motorCanId, MotorArmType::kBrushless), encoder(motor.GetEncoder()), pidCtrl(motor.GetPIDController()),
   lmsw(lmswPort), coeff(coeff), minPos(minPos), maxPos(maxPos), tolerance(tolerance), timesInTolReq(timesInTolReq) {
   // empty
 }
@@ -143,6 +144,11 @@ void ArmComponent::Initialize(bool invert, double p, double i, double d, double 
   pidCtrl.SetOutputRange(min, max);
 }
 
+void ArmComponent::AttachPneumatics(Pneumatics *pneu) {
+  this->pneu = pneu;
+  SetAbsolute(0.0);
+}
+
 std::optional<ArmComponent::MoveInfo> ArmComponent::Set(double rawControllerInput, bool inverted) {
   const double thresholded = Util::thresholded(rawControllerInput, -0.08, 0.08);
 
@@ -158,6 +164,10 @@ std::optional<ArmComponent::MoveInfo> ArmComponent::Set(double rawControllerInpu
 
 double ArmComponent::SetAbsolute(double pos) { 
   const double constrained = Util::constrained(pos, minPos, maxPos);
+
+  if (unlock && pneu) {
+    pneu->SetLockTilt(false);
+  }
 
   pidCtrl.SetReference(constrained, SparkMaxCtrlType::kPosition);
   targetPosition = constrained;
@@ -184,3 +194,11 @@ bool ArmComponent::InTolerance(){
   CheckTolerance();
   return timesInTol >= timesInTolReq;
 }
+
+
+// VisionCubePipeline::VisionCubePipeline(std::string cameraName) : m_cameraName(cameraName)
+// {}
+
+// bool VisionCubePipeline::IsCubeFound(){
+//   return frc::SmartDashboard::GetBoolean("")
+// }
